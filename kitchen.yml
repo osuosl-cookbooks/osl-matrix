@@ -22,4 +22,3 @@ suites:
     driver:
       name: openstack
       flavor_ref: 'm1.medium'
-

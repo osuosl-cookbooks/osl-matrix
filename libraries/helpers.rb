@@ -2,25 +2,17 @@ module OSLMatrix
   module Cookbook
     module Helpers
 
-      # Create the synapse user, and the recommended directories
-      def init_environment()
-        user 'synapse-host' do
-          system true
-        end
-
-        # Synapse configuration
-        directory '/srv/synapse' do
-          owner 'synapse-host'
-          mode '750'
-        end
-
-        # Keys directory
-        directory '/srv/synapse/keys' do
-          owner 'synapse-host'
-          mode '700'
-        end
+      # Generate a secret key. Mainly used when wanting a registration key
+      def osl_matrix_genkey(len = 64)
+        require 'securerandom'
+        SecureRandom.base64(len)
       end
-
+      
+      # Get the name of the synapse docker container name, given the name of the synapse resource which creates it
+      def osl_synapse_docker_name(strSynapseResource)
+        # Get the resource, and return the name
+        find_resource(:osl_synapse, strSynapseResource).name
+      end
     end
   end
 end

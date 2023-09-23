@@ -7,41 +7,25 @@ unified_mode true
 
 default_action :create
 
-property :domain, String, name_property: true
-property :matrix_domain, String
+property :matrix_domain, String, name_property: true
+property :port, Integer, default: 8000
 
 action :create do
   include_recipe 'osl-docker'
-  include_recipe 'osl-nginx'
 
-  hostname node['hostname'] do
-    aliases [new_resource.domain]
-  end
+  directory '/opt/element'
 
-  directory '/srv/element'
-
-  cookbook_file '/srv/element/config.json' do
-    source 'element-config.json'
+  template '/opt/element/config.json' do
+    source 'element-config.json.erb'
     cookbook 'osl-matrix'
+    variables(fqdn: new_resource.matrix_domain)
   end
 
   docker_image 'vectorim/element-web'
 
   docker_container 'element_webapp' do
     repo 'vectorim/element-web'
-    port ['8000:80']
-    volumes ['/srv/element/config.json:/app/config.json']
-  end
-
-  template 'Element Reverse Proxy' do
-    source 'element-web.conf.erb'
-    path "/etc/nginx/conf.d/#{new_resource.domain}.conf"
-    cookbook 'osl-matrix'
-    variables('fqdn': new_resource.domain)
-
-    owner 'nginx'
-    group 'nginx'
-
-    notifies :reload, 'nginx_service[osuosl]', :immediately
+    port ["#{new_resource.port}:80"]
+    volumes ['/opt/element/config.json:/app/config.json']
   end
 end

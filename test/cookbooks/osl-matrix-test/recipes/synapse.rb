@@ -1,12 +1,7 @@
-include_recipe 'osl-docker'
-
-# Add on the Heisenbridge app service
-osl_heisenbridge 'osl-irc-bridge'
-
 # Create the synapse docker container
-osl_matrix 'chat.osuosl.intnet' do
+osl_synapse 'chat.osuosl.intnet' do
+  app_services %w(osl-irc-bridge)
   use_sqlite true
-  app_services ['osl-irc-bridge']
   config <<~EOF
 modules:
   - module: "ldap_auth_provider.LdapAuthProviderModule"
@@ -21,3 +16,10 @@ modules:
         name: "givenName"
   EOF
 end
+
+# Add on the Heisenbridge app service
+osl_heisenbridge 'osl-irc-bridge' do
+  matrix_host_resource :osl_synapse
+  matrix_host_domain 'chat.osuosl.intnet'
+end
+
