@@ -7,7 +7,7 @@ osl_synapse 'chat.example.org' do
       'modules' => [
         {
           'module' => 'ldap_auth_provider.LdapAuthProviderModule',
-          'config'=> {
+          'config' => {
             'enabled' => true,
             'uri' => 'ldap://ldap.osuosl.org:389',
             'start_tls' => true,
@@ -19,7 +19,7 @@ osl_synapse 'chat.example.org' do
             },
           },
         },
-      ]
+      ],
     }
   )
 end
