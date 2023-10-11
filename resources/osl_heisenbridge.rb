@@ -10,21 +10,18 @@ default_action :create
 
 property :container_name, String, name_property: true
 property :port, Integer, default: 9898
-property :matrix_host_resource, Symbol, required: true, default: :osl_synapse
-property :matrix_host_domain, String, required: true
+property :host_domain, String, required: true
+property :host_name, String, default: lazy { "matrix-synapse-#{host_domain}" }
+property :host_path, String, default: lazy { "/opt/synapse-#{host_name}" }
+property :host_network, String, default: lazy { "synapse-network-#{host_name}" }
 
 action :create do
-  # Get the required information taken from the matrix host resource
-  matrix_resource = find_resource(new_resource.matrix_host_resource, new_resource.matrix_host_domain)
-  path = matrix_resource.path
-  name = matrix_resource.name
-  network = matrix_resource.network
-
+  new_resource.host_name = new_resource.host_name
   # Pull down the heisenbridge image
   docker_image 'hif1/heisenbridge'
 
   # Generate the app service file
-  template "#{path}/#{new_resource.container_name}.yaml" do
+  template "#{new_resource.host_path}/#{new_resource.container_name}.yaml" do
     source 'appservice.erb'
     cookbook 'osl-matrix'
     mode '644'
@@ -38,23 +35,24 @@ action :create do
         users: [
           {
             exclusive: true,
-            regex: '\'@irc_.*\''
-          }
-        ]
+            regex: '\'@irc_.*\'',
+          },
+        ],
       }
     )
+    sensitive true
   end
 
   # Create the docker container
   docker_container new_resource.container_name do
     repo 'hif1/heisenbridge'
-    volumes ["#{path}/#{new_resource.container_name}.yaml:/data/#{new_resource.container_name}.yaml"]
-    entrypoint "python -m heisenbridge -c /data/#{new_resource.container_name}.yaml http://#{name}:8008"
+    volumes ["#{new_resource.host_path}/#{new_resource.container_name}.yaml:/data/#{new_resource.container_name}.yaml"]
+    entrypoint "python -m heisenbridge -c /data/#{new_resource.container_name}.yaml http://#{new_resource.host_name}:8008"
     restart_policy 'always'
   end
 
   # Connect to the network
-  docker_network network do
+  docker_network new_resource.host_network do
     container new_resource.container_name
     action :connect
   end

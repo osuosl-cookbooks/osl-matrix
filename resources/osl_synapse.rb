@@ -5,11 +5,11 @@ unified_mode true
 default_action :create
 
 property :app_services, Array, default: []
-property :config, String
+property :config, Hash
 property :domain, String, name_property: true
-property :name, String
-property :network, String
-property :path, String
+property :container_name, String, default: lazy { "matrix-synapse-#{domain}" }
+property :network, String, default: lazy { "synapse-network-#{container_name}" }
+property :path, String, default: lazy { "/opt/synapse-#{container_name}" }
 property :pg_host, String
 property :pg_name, String
 property :pg_username, String
@@ -19,13 +19,6 @@ property :tag, String, default: 'latest'
 property :use_sqlite, [true, false], default: false
 
 action :create do
-  # Check to see if a name was given
-  new_resource.name = "matrix-synapse-#{new_resource.domain}" unless new_resource.name
-  # Get the path to use for this resource
-  new_resource.path = "/opt/synapse-#{new_resource.name}" unless new_resource.path
-  # Set the docker network
-  new_resource.network = "synapse-network-#{new_resource.name}" unless new_resource.network
-
   include_recipe 'osl-docker'
 
   # Initalize the synapse user
@@ -53,7 +46,7 @@ action :create do
     content osl_matrix_genkey
     owner 'synapse'
     mode '400'
-
+    sensitive true
     action :create_if_missing
   end
 
@@ -71,13 +64,15 @@ action :create do
       pg_username: new_resource.pg_username,
       pg_password: new_resource.pg_password,
       sqlite: new_resource.use_sqlite,
-      user_config: new_resource.config,
+      # For the YAML dump, we need to remove the document start line.
+      user_config: YAML.dump(new_resource.config).lines[1..-1].join
     )
+    sensitive true
   end
 
   docker_image 'matrixdotorg/synapse'
 
-  docker_container new_resource.name do
+  docker_container new_resource.container_name do
     repo 'matrixdotorg/synapse'
     port ["#{new_resource.port}:8008"]
     volumes ["#{new_resource.path}:/data"]
@@ -88,8 +83,7 @@ action :create do
 
   # Connect the synapse server to the docker network
   docker_network new_resource.network do
-    container new_resource.name
+    container new_resource.container_name
     action :connect
   end
-
 end

@@ -9,7 +9,7 @@ require_relative '../../spec_helper'
 
 describe 'osl-matrix-test::element' do
   cached(:subject) { chef_run }
-  platform 'almalinux', '9'
+  platform 'almalinux', '8'
   step_into :osl_element
 
   it { is_expected.to include_recipe('osl-nginx') }
