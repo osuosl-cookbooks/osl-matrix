@@ -1,6 +1,6 @@
 # Create the synapse docker container
 osl_synapse 'chat.example.org' do
-  app_services %w(osl-irc-bridge)
+  app_services %w(osl-irc-bridge osl-hookshot-webhook)
   use_sqlite true
   config(
     {
@@ -27,4 +27,27 @@ end
 # Add on the Heisenbridge app service
 osl_heisenbridge 'osl-irc-bridge' do
   host_domain 'chat.example.org'
+end
+
+# Add on the Hookshot app service
+osl_hookshot 'osl-hookshot-webhook' do
+  host_domain 'chat.example.org'
+  config({
+    'permissions' => [
+      {
+        'actor' => 'chat.example.org',
+        'services' => [
+          {
+            'service' => '*',
+            'level' => 'admin',
+          },
+        ],
+      },
+    ],
+    'generic' => {
+      'enabled' => true,
+      'urlPrefix' => 'http://chat.example.org/webhook',
+      'userIdPrefix' => 'my-amazing-hook_',
+    },
+  })
 end

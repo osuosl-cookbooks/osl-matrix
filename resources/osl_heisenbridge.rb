@@ -14,6 +14,8 @@ property :host_domain, String, required: true
 property :host_name, String, default: lazy { "matrix-synapse-#{host_domain}" }
 property :host_path, String, default: lazy { "/opt/synapse-#{host_name}" }
 property :host_network, String, default: lazy { "synapse-network-#{host_name}" }
+property :key_appservice, String, default: lazy { osl_matrix_genkey(host_name + container_name) }
+property :key_homeserver, String, default: lazy { osl_matrix_genkey(host_network + container_name) }
 
 action :create do
   new_resource.host_name = new_resource.host_name
@@ -21,27 +23,21 @@ action :create do
   docker_image 'hif1/heisenbridge'
 
   # Generate the app service file
-  template "#{new_resource.host_path}/#{new_resource.container_name}.yaml" do
-    source 'appservice.erb'
-    cookbook 'osl-matrix'
-    mode '644'
-    variables(
-      id: 'heisenbridge',
-      url: "http://#{new_resource.container_name}:#{new_resource.port}",
-      matrix_rand_appservice: 'appservicekey',
-      matrix_rand_homeserver: 'homeserverkey',
-      service: 'heisenbridge',
-      namespaces: {
-        users: [
-          {
-            exclusive: true,
-            regex: '\'@irc_.*\'',
-          },
-        ],
-      }
-    )
-    sensitive true
-  end
+  osl_synapse_appservice(
+    'heisenbridge',
+    "http://#{new_resource.container_name}:#{new_resource.port}",
+    new_resource.key_appservice,
+    new_resource.key_homeserver,
+    'heisenbridge',
+    {
+      users: [
+        {
+          exclusive: true,
+          regex: '\'@irc_.*\'',
+        },
+      ],
+    }
+  )
 
   # Create the docker container
   docker_container new_resource.container_name do
