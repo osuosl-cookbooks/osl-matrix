@@ -74,7 +74,7 @@ action :create do
   new_resource.config['bridge'] = {} unless new_resource.config['bridge']
   new_resource.config['bridge'].merge!({
     'domain' => new_resource.host_domain,
-    'url' => "http://#{new_resource.host_name}:#{new_resource.port_host}",
+    'url' => "http://#{new_resource.host_name}:#{find_resource(:osl_synapse, new_resource.host_domain).port}", # Find the synapse resource, and get the port
     'port' => new_resource.port,
     'bindAddress' => '0.0.0.0',
   }) { |_key, old_value, new_value| old_value || new_value }
@@ -117,8 +117,9 @@ action :create do
 
   # Generate Passkey for encrypting tokens
   execute 'Generating Hookshot Passkey' do
-    command "openssl genpkey -out \"#{new_resource.host_path}/keys/hookshot.pem\" -outform PEM -algorithm RSA -pkeyopt rsa_keygen_bits:4096"
+    command "openssl genpkey -out \"#{new_resource.host_path}/keys/hookshot.pem\" -outform PEM -algorithm RSA -pkeyopt rsa_keygen_bits:4096; chmod 400 '#{new_resource.host_path}/keys/hookshot.pem'"
     user 'synapse'
+    group 'synapse'
     creates "#{new_resource.host_path}/keys/hookshot.pem"
   end
 
@@ -127,11 +128,10 @@ action :create do
     content YAML.dump(new_resource.config).lines[1..-1].join
     owner 'synapse'
     group 'synapse'
-    mode '770'
+    mode '400'
     sensitive true
   end
 
-  # Determine if we should have the metric port open
   # Create the docker container
   docker_container new_resource.container_name do
     repo 'halfshot/matrix-hookshot'

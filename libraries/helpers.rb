@@ -19,7 +19,9 @@ module OSLMatrix
         template "#{new_resource.host_path}/#{new_resource.container_name}.yaml" do
           source 'appservice.erb'
           cookbook 'osl-matrix'
-          mode '644'
+          user 'synapse'
+          group 'synapse'
+          mode '400'
           variables(
             id: id,
             url: url,

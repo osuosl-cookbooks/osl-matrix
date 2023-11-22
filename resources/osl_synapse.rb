@@ -17,7 +17,7 @@ property :pg_password, String
 property :port, Integer, default: 8008
 property :reg_key, String, default: lazy { osl_matrix_genkey(network + path + container_name) }
 property :tag, String, default: 'latest'
-property :use_sqlite, [true, false], default: lazy { pg_host and pg_name and pg_username and pg_password } # Automatically use SQlite if not all SQL settings have been set.
+property :use_sqlite, [true, false], default: lazy { !pg_host and !pg_name and !pg_username and !pg_password } # Automatically use SQlite if not all SQL settings have been set.
 
 action :create do
   include_recipe 'osl-docker'
