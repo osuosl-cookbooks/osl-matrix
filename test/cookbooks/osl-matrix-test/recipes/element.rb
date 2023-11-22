@@ -1,1 +1,1 @@
-osl_element 'talk.osuosl.intnet'
+osl_element 'chat.example.org'

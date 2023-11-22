@@ -13,12 +13,6 @@ suites:
   - name: synapse
     run_list:
       - recipe[osl-matrix-test::synapse]
-    driver:
-      name: openstack
-      flavor_ref: 'm1.medium'
   - name: element
     run_list:
       - recipe[osl-matrix-test::element]
-    driver:
-      name: openstack
-      flavor_ref: 'm1.medium'

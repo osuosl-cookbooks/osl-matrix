@@ -3,15 +3,15 @@ module OSLMatrix
     module Helpers
       # Generate a secret key through hashing a string. Mainly used when wanting a registration key
       # WARNING: Not recommended for an actual deployment, only done when no secret is given.
-      def osl_matrix_genkey(strPlaintext)
+      def osl_matrix_genkey(plain_text)
         require 'digest'
-        Digest::MD5.hexdigest(strPlaintext)
+        Digest::MD5.hexdigest(plain_text)
       end
 
       # Get the name of the synapse docker container name, given the name of the synapse resource which creates it
-      def osl_synapse_docker_name(strSynapseResource)
+      def osl_synapse_docker_name(synapse_resource)
         # Get the resource, and return the name
-        find_resource(:osl_synapse, strSynapseResource).name
+        find_resource(:osl_synapse, synapse_resource).name
       end
 
       # Create an app service file for Matrix Synapse
