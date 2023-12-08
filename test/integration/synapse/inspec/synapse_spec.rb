@@ -45,7 +45,7 @@ describe docker_container('matrix-synapse-chat.example.org') do
 end
 
 # Check to see if we can send HTTP requests
-describe http('localhost:8008/_matrix/client/versions', headers: {'host': 'chat.example.org'}) do
+describe http('localhost:8008/_matrix/client/versions', headers: { 'host': 'chat.example.org' }) do
   its('status') { should eq 200 }
 end
 
