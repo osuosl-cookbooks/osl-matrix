@@ -29,10 +29,11 @@ describe file('/opt/synapse-matrix-synapse-chat.example.org/homeserver.yaml') do
   it { should exist }
   its('owner') { should eq 'synapse' }
   its('content') { should match 'server_name: chat.example.org' }
-  its('content') { should match 'media_store_path: /data/media_store' }
+  its('content') { should match 'media_store_path: "/data/media_store"' }
   its('content') { should match '/data/osl-irc-bridge.yaml' }
   its('content') { should match '/data/osl-hookshot-webhook.yaml' }
   its('content') { should match 'module: ldap_auth_provider.LdapAuthProviderModule' }
+  its('content') { should match 'database: "/data/homeserver-sqlite.db"' }
 end
 
 # Docker Container

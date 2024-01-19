@@ -4,6 +4,8 @@ Deploy a Matrix Synapse server, and configure the server.
 
 **WARNING**: This resource is not responsible for setting up a secure web environment, please look into implementing `osl-apache` in your recipe to act as a reverse proxy.
 
+Any missing properties with the `pg_` prefix will result in the server setting up an SQLite database. This database type is not recommended for deployments.
+
 ## Actions
 
 | Action   | Description                       |
@@ -27,7 +29,6 @@ Deploy a Matrix Synapse server, and configure the server.
 | `port`           | Integer          | `8008`                                           | The port which the Matrix Synapse server will listen on for web traffic | |
 | `reg_key`        | String           | `MD5 hash of container_name, network, and path`  | **IMPORTANT, SECURITY** A random string which is used for registering accounts, whenever and whererver. Admin or standard user. We advise you set this with a databag entry | Encouraged |
 | `tag`            | String           | `latest`                                         | The Matrix Synapse version to deploy. Please view the [Docker Hub](https://hub.docker.com/r/matrixdotorg/synapse/tags) for valid entries. | |
-| `use_sqlite`     | `true`, `false`  | `True if all pg_* properties are set`            | Manually declare the use of sqlite, instead of connecting to the PostgreSQL instance. **Recommended only for development and staging** | |
 
 ## Examples
 ```ruby

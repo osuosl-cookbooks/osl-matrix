@@ -135,6 +135,7 @@ action :create do
   # Create the docker container
   docker_container new_resource.container_name do
     repo 'halfshot/matrix-hookshot'
+    user "#{Etc.getpwnam('synapse').uid.to_s}:#{Etc.getpwnam('synapse').gid.to_s}"
     volumes [
       "#{new_resource.host_path}/#{new_resource.container_name}.yaml:/data/registration.yml",
       "#{new_resource.host_path}/#{new_resource.container_name}-config.yaml:/data/config.yml",

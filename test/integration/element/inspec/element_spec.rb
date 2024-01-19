@@ -1,29 +1,29 @@
-# Synapse Server User
-describe user('synapse') do
+# Element container
+describe docker_container('element_webapp') do
+  it { should exist }
+  it { should be_running }
+  its('image') { should eq 'vectorim/element-web:latest' }
+  its('ports') { should match '0.0.0.0:8000->80/tcp' }
+end
+
+# Site's config
+
+describe directory('/opt/element') do
   it { should exist }
 end
 
-# Synapse Server File Structure
-describe directory('/opt/synapse-chat.example.org') do
+describe file('/opt/element/config.json') do
   it { should exist }
-  its('owner') { should eq 'synapse' }
-  its('mode') { should eq '750' }
+  its('content') { should match '"base_url": "https://chat.example.org"' }
 end
 
-describe directory('/opt/synapse-chat.example.org/keys') do
-  it { should exist }
-  its('owner') { should eq 'synapse' }
-  its('mode') { should eq '700' }
+# Website
+describe port(8000) do
+  it { should be_listening }
+  its('protocols') { should include 'tcp' }
 end
 
-describe file('/opt/synapse-chat.example.org/keys/registration.key') do
-  it { should exist }
-  its('owner') { should eq 'synapse' }
-  its('mode') { should eq '400' }
-end
-
-describe file('/opt/synapse-chat.example.org/homeserver.yaml') do
-  it { should exist }
-  its('owner') { should eq 'synapse' }
-  its('mode') { should eq '600' }
+describe http('127.0.0.1:8000', headers: { 'Host': 'chat.example.org' }) do
+  its('status') { should eq 200 }
+  its('body') { should match '<title>Element</title>' }
 end

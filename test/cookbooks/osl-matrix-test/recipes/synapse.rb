@@ -1,7 +1,7 @@
 # Create the synapse docker container
 osl_synapse 'chat.example.org' do
   app_services %w(osl-irc-bridge osl-hookshot-webhook)
-  use_sqlite true
+  reg_key 'this-is-my-secret'
   config(
     {
       'modules' => [

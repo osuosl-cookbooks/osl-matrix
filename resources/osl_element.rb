@@ -19,7 +19,6 @@ action :create do
     source 'element-config.json.erb'
     cookbook 'osl-matrix'
     variables(fqdn: new_resource.matrix_domain)
-    sensitive true
   end
 
   docker_image 'vectorim/element-web'

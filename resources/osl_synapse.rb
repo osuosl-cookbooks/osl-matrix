@@ -17,14 +17,29 @@ property :pg_password, String
 property :port, Integer, default: 8008
 property :reg_key, String, default: lazy { osl_matrix_genkey(network + path + container_name) }
 property :tag, String, default: 'latest'
-property :use_sqlite, [true, false], default: lazy { !pg_host and !pg_name and !pg_username and !pg_password } # Automatically use SQlite if not all SQL settings have been set.
 
 action :create do
   include_recipe 'osl-docker'
 
+  # Merge the defined properties into the config.
+  new_resource.config.merge!(
+    osl_homeserver_defaults(
+      new_resource.domain,
+      {
+        host: new_resource.pg_host,
+        database: new_resource.pg_name,
+        username: new_resource.pg_username,
+        password: new_resource.pg_password,
+      },
+      new_resource.app_services
+    )
+  ) { |_key, config_value, default_value| config_value || default_value }
+
   # Initalize the synapse user
   user 'synapse' do
     system true
+    # Do an initial server restart after the first run.
+    notifies :restart, "docker_container[#{new_resource.container_name}]", :delayed
   end
 
   # Synapse configuration
@@ -52,22 +67,11 @@ action :create do
   end
 
   # Generate homeserver.yaml
-  template "#{new_resource.path}/homeserver.yaml" do
-    source 'homeserver.yaml.erb'
-    cookbook 'osl-matrix'
+  file "#{new_resource.path}/homeserver.yaml" do
+    content YAML.dump(new_resource.config).lines[1..-1].join
     owner 'synapse'
-    mode '600'
-    variables(
-      appservices: new_resource.app_services,
-      domain: new_resource.domain,
-      pg_host: new_resource.pg_host,
-      pg_name: new_resource.pg_name,
-      pg_username: new_resource.pg_username,
-      pg_password: new_resource.pg_password,
-      sqlite: new_resource.use_sqlite,
-      # For the YAML dump, we need to remove the document start line.
-      user_config: YAML.dump(new_resource.config).lines[1..-1].join
-    )
+    group 'synapse'
+    mode '400'
     sensitive true
   end
 
@@ -75,9 +79,9 @@ action :create do
 
   docker_container new_resource.container_name do
     repo 'matrixdotorg/synapse'
-    port ["#{new_resource.port}:8008"]
+    port ["#{new_resource.port}:8008", '8448:8448']
     volumes ["#{new_resource.path}:/data"]
-    env ["UID=#{Etc.getpwnam('synapse').uid.to_s}"]
+    user "#{Etc.getpwnam('synapse').uid.to_s}:#{Etc.getpwnam('synapse').gid.to_s}"
     subscribes :restart, "template[#{new_resource.path}/homeserver.yaml]"
     restart_policy 'always'
   end
@@ -86,5 +90,12 @@ action :create do
   docker_network new_resource.network do
     container new_resource.container_name
     action :connect
+  end
+end
+
+# Restart the synapse container.
+action :restart do
+  docker_container new_resource.container_name do
+    action :restart
   end
 end

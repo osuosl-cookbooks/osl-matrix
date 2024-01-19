@@ -42,6 +42,7 @@ action :create do
   # Create the docker container
   docker_container new_resource.container_name do
     repo 'hif1/heisenbridge'
+    user "#{Etc.getpwnam('synapse').uid.to_s}:#{Etc.getpwnam('synapse').gid.to_s}"
     volumes ["#{new_resource.host_path}/#{new_resource.container_name}.yaml:/data/#{new_resource.container_name}.yaml"]
     entrypoint "python -m heisenbridge -c /data/#{new_resource.container_name}.yaml http://#{new_resource.host_name}:8008"
     restart_policy 'always'
