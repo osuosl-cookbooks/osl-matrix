@@ -24,6 +24,11 @@ property :tag, String, default: 'latest'
 property :sensitive, [true, false], default: true
 
 action :create do
+  # Pull down the latest version
+  docker_image 'halfshot/matrix-hookshot' do
+    tag new_resource.tag
+  end
+
   # Parse out all of the instance of userIdPrefix in order to modify the appservice registration
   arrAppServiceUsers = []
   # Get the config from the new resource, and put into a mutable variable

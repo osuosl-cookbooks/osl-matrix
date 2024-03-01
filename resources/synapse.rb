@@ -21,6 +21,11 @@ property :sensitive, [true, false], default: true
 action :create do
   include_recipe 'osl-docker'
 
+  # Pull down the latest version
+  docker_image 'matrixdotorg/synapse' do
+    tag new_resource.tag
+  end
+
   # Merge the defined properties into the config.
   config = new_resource.config.merge(
     osl_homeserver_defaults(

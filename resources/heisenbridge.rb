@@ -19,6 +19,11 @@ property :tag, String, default: 'latest'
 property :sensitive, [true, false], default: true
 
 action :create do
+  # Pull down the latest version
+  docker_image 'hif1/heisenbridge' do
+    tag new_resource.tag
+  end
+
   # Generate the app service file
   osl_synapse_appservice(
     'heisenbridge',
