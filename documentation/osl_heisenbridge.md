@@ -2,7 +2,9 @@
 
 A Matrix appservice which allows for bridging IRC chat messages.
 
-**IMPORTANT**: Appservice resources should only be called *after* deploying the Matrix Synapse Server.
+**IMPORTANT**:
+* Appservice resources should only be called *after* deploying the Matrix Synapse Server.
+* This resource will not deploy, by itself. It requires an [`osl_dockercompose`](https://github.com/osuosl-cookbooks/osl-docker/blob/master/resources/dockercompose.rb) resource.
 
 ## Actions
 
@@ -22,12 +24,13 @@ A Matrix appservice which allows for bridging IRC chat messages.
 | `host_path`      | String  | `/opt/synapse-{host_name}`                    | The path to the configuration files of the Matrix Synapse server  | |
 | `key_appservice` | String  | `MD5 hash of host_name and container_name`    | **IMPORTANT, SECURITY** A string token that the appservices uses to authenticate requests to the homeserver. Please change out with a databag entry | Encouraged |
 | `key_homeserver` | String  | `MD5 hash of host_network and container_name` | **IMPORTANT, SECURITY** A string token that the homesever uses to authenticate requests to the appservice. Please change out with a databag entry | Encouraged |
+| `tag`            | String  | `latest`                                      | The Heisenbridge version to deploy. Please view the [Docker Hub](https://hub.docker.com/r/hif1/heisenbridge) for valid entries. | |
 
 ## Examples
 ```ruby
 # Deploy Heisenbridge onto chat.example.org
 osl_synapse 'chat.example.org' do
-  app_services: %w(example-heisenbridge)
+  appservices: %w(example-heisenbridge)
 end
 
 osl_heisenbridge 'example-heisenbridge' do

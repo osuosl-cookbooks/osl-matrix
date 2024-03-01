@@ -15,38 +15,37 @@ property :port, Integer, default: 9993
 property :port_webhook, Integer, default: 9000
 property :port_metric, Integer, default: 9001
 property :port_widget, Integer, default: 9002
-property :port_host, Integer, default: 8008
 property :host_domain, String, required: true
-property :host_name, String, default: lazy { "matrix-synapse-#{host_domain}" }
-property :host_path, String, default: lazy { "/opt/synapse-#{host_name}" }
-property :host_network, String, default: lazy { "synapse-network-#{host_name}" }
+property :host_name, String, default: lazy { "synapse-#{host_domain}" }
+property :host_path, String, default: lazy { "/opt/#{host_name}" }
 property :key_appservice, String, default: lazy { osl_matrix_genkey(host_name + container_name) }
-property :key_homeserver, String, default: lazy { osl_matrix_genkey(host_network + container_name) }
+property :key_homeserver, String, default: lazy { osl_matrix_genkey(container_name + host_name) }
+property :tag, String, default: 'latest'
+property :sensitive, [true, false], default: true
 
 action :create do
-  # Pull down the Hookshot image
-  docker_image 'halfshot/matrix-hookshot'
-
   # Parse out all of the instance of userIdPrefix in order to modify the appservice registration
   arrAppServiceUsers = []
+  # Get the config from the new resource, and put into a mutable variable
+  config = new_resource.config
   # Loop over the root hash
-  new_resource.config.each_value do |val|
+  config.each_value do |val|
     # Check to see if the sub-hash has a key called userIDPrefix
     unless val.is_a?(Hash) && val.key?('userIdPrefix')
       next
     end
     # Add the userIDPrefix
     arrAppServiceUsers.push({
-      exclusive: true,
-      regex: "\'@#{val['userIdPrefix']}_.*\'",
+      'exclusive' => true,
+      'regex' => "@#{val['userIdPrefix']}_.*",
     })
   end
 
   # Add in something if there was nothing given
   unless arrAppServiceUsers
     arrAppServiceUsers.push({
-      exclusive: true,
-      regex: '\'@webhook_.*\'',
+      'exclusive' => true,
+      'regex' => '\'@webhook_.*\'',
     })
   end
 
@@ -58,21 +57,21 @@ action :create do
     new_resource.key_homeserver,
     'hookshot',
     {
-      users: arrAppServiceUsers,
+      'users' => arrAppServiceUsers,
     }
   )
 
   # Auto configuration for the homeserver, ignore if already set
   # Passkey settings
   # Not usually needed to be modified by user, as we generate our own, but just in case.
-  new_resource.config.merge!({
+  config.merge!({
     'passFile' => '/data/hookshot.pem',
   }) { |_key, old_value, new_value| old_value || new_value }
 
   # Bridge settings
   # Ensure the bridge key hash exists
-  new_resource.config['bridge'] = {} unless new_resource.config['bridge']
-  new_resource.config['bridge'].merge!({
+  config['bridge'] = {} unless config['bridge']
+  config['bridge'].merge!({
     'domain' => new_resource.host_domain,
     'url' => "http://#{new_resource.host_name}:#{find_resource(:osl_synapse, new_resource.host_domain).port}", # Find the synapse resource, and get the port
     'port' => new_resource.port,
@@ -81,7 +80,7 @@ action :create do
 
   # Listeners settings
   # Force the automatically generated configuration, custom config goes against the spirit of some properties.
-  if new_resource.config['listeners']
+  if config['listeners']
     # Get the information about where the resource is declared, and tell the developer that there will be changes to the defined key.
     pResource = find_resource(:osl_hookshot, new_resource.container_name)
     log 'Checking for overwriting custom configuration' do
@@ -90,7 +89,7 @@ action :create do
     end
   end
 
-  new_resource.config['listeners'] = [
+  config['listeners'] = [
     {
       'port' => new_resource.port_webhook,
       'bindAddress' => '0.0.0.0',
@@ -125,33 +124,40 @@ action :create do
 
   # Generate the config file
   file "#{new_resource.host_path}/#{new_resource.container_name}-config.yaml" do
-    content YAML.dump(new_resource.config).lines[1..-1].join
+    content osl_yaml_dump(new_resource.config)
     owner 'synapse'
     group 'synapse'
     mode '400'
     sensitive true
   end
 
-  # Create the docker container
-  docker_container new_resource.container_name do
-    repo 'halfshot/matrix-hookshot'
-    user "#{Etc.getpwnam('synapse').uid.to_s}:#{Etc.getpwnam('synapse').gid.to_s}"
-    volumes [
-      "#{new_resource.host_path}/#{new_resource.container_name}.yaml:/data/registration.yml",
-      "#{new_resource.host_path}/#{new_resource.container_name}-config.yaml:/data/config.yml",
-      "#{new_resource.host_path}/keys/hookshot.pem:/data/hookshot.pem",
-    ]
-    port [
-      "#{new_resource.port_webhook}:#{new_resource.port_webhook}",
-      "#{new_resource.port_metric}:#{new_resource.port_metric}",
-      "#{new_resource.port_widget}:#{new_resource.port_widget}",
-    ]
-    restart_policy 'always'
-  end
+  # Generate the compose config
+  config_compose = {
+    'services' => {
+      new_resource.container_name => {
+        'image' => "halfshot/matrix-hookshot:#{new_resource.tag}",
+        'ports' => [
+          "#{new_resource.port_webhook}:#{new_resource.port_webhook}",
+          "#{new_resource.port_metric}:#{new_resource.port_metric}",
+          "#{new_resource.port_widget}:#{new_resource.port_widget}",
+        ],
+        'volumes' => [
+          "#{new_resource.host_path}/appservice/#{new_resource.container_name}.yaml:/data/registration.yml",
+          "#{new_resource.host_path}/#{new_resource.container_name}-config.yaml:/data/config.yml",
+          "#{new_resource.host_path}/keys/hookshot.pem:/data/hookshot.pem",
+        ],
+        'user' => osl_synapse_user,
+        'restart' => 'always',
+      },
+    },
+  }
 
-  # Connect to the network
-  docker_network new_resource.host_network do
-    container new_resource.container_name
-    action :connect
+  # Generate compose file
+  file "#{new_resource.host_path}/compose/docker-#{new_resource.container_name}.yaml" do
+    content osl_yaml_dump(config_compose)
+    owner 'synapse'
+    group 'synapse'
+    mode '400'
+    sensitive true
   end
 end

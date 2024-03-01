@@ -8,7 +8,7 @@
 require_relative '../../spec_helper'
 
 # osl_synapse
-describe 'osl-matrix-test::synapse' do
+describe 'osl-matrix-test::synapse-no-quick' do
   cached(:subject) { chef_run }
   platform 'almalinux', '8'
   include_context 'pwnam'
@@ -19,26 +19,25 @@ describe 'osl-matrix-test::synapse' do
 
   # Synapse instance directory
   it {
-    is_expected.to create_directory('/opt/synapse-matrix-synapse-chat.example.org').with(
+    is_expected.to create_directory('/opt/synapse-chat.example.org').with(
       owner: 'synapse',
       mode: '750'
     )
   }
 
-  # Synapse instance's keys directory, more confidential
+  # Synapse instance's more confidential directories: keys, appservice, and compose
   it {
-    is_expected.to create_directory('/opt/synapse-matrix-synapse-chat.example.org').with(
-      owner: 'synapse',
-      mode: '750'
-    )
+    %w(appservice compose keys).each do |dir|
+      is_expected.to create_directory("/opt/synapse-chat.example.org/#{dir}").with(
+        owner: 'synapse',
+        mode: '700'
+      )
+    end
   }
-
-  # Docker network for this synapse instance's ecosystem.
-  it { is_expected.to create_docker_network('synapse-network-matrix-synapse-chat.example.org') }
 
   # Matrix instance's secret key
   it {
-    is_expected.to create_if_missing_file('/opt/synapse-matrix-synapse-chat.example.org/keys/registration.key').with(
+    is_expected.to create_if_missing_file('/opt/synapse-chat.example.org/keys/registration.key').with(
       content: 'this-is-my-secret',
       owner: 'synapse',
       mode: '400',
@@ -48,7 +47,7 @@ describe 'osl-matrix-test::synapse' do
 
   # Generate the Homeserver config
   it {
-    is_expected.to create_file('/opt/synapse-matrix-synapse-chat.example.org/homeserver.yaml').with(
+    is_expected.to create_file('/opt/synapse-chat.example.org/homeserver.yaml').with(
       owner: 'synapse',
       group: 'synapse',
       mode: '400',
@@ -56,29 +55,19 @@ describe 'osl-matrix-test::synapse' do
     )
   }
 
-  # Pull down the image
-  it { is_expected.to pull_docker_image('matrixdotorg/synapse') }
-
-  # Create the Synapse container
+  # Create the Synapse compose file
   it {
-    is_expected.to run_docker_container('matrix-synapse-chat.example.org').with(
-      repo: 'matrixdotorg/synapse',
-      port: %w(8008:8008 8448:8448),
-      user: '1001:',
-      restart_policy: 'always'
-    )
-  }
-
-  # Connect the synapse container to the network ecosystem
-  it {
-    is_expected.to connect_docker_network('synapse-network-matrix-synapse-chat.example.org').with(
-      container: 'matrix-synapse-chat.example.org'
+    is_expected.to create_file('/opt/synapse-chat.example.org/compose/docker-synapse.yaml').with(
+      owner: 'synapse',
+      group: 'synapse',
+      mode: '400',
+      sensitive: true
     )
   }
 end
 
 # osl_heisenbridge
-describe 'osl-matrix-test::synapse' do
+describe 'osl-matrix-test::synapse-no-quick' do
   cached(:subject) { chef_run }
   platform 'almalinux', '8'
   include_context 'pwnam'
@@ -86,7 +75,7 @@ describe 'osl-matrix-test::synapse' do
 
   # Appservice file
   it {
-    is_expected.to create_file('/opt/synapse-matrix-synapse-chat.example.org/osl-irc-bridge.yaml').with(
+    is_expected.to create_file('/opt/synapse-chat.example.org/appservice/osl-irc-bridge.yaml').with(
       owner: 'synapse',
       group: 'synapse',
       mode: '400',
@@ -94,28 +83,18 @@ describe 'osl-matrix-test::synapse' do
     )
   }
 
-  # Pull down the heisenbridge image
-  it { is_expected.to pull_docker_image('hif1/heisenbridge') }
-
-  # Create the Docker Container
+  # Create the Heisenbridge compose file
   it {
-    is_expected.to run_docker_container('osl-irc-bridge').with(
-      repo: 'hif1/heisenbridge',
-      user: '1001:',
-      entrypoint: %w(python -m heisenbridge -c /data/osl-irc-bridge.yaml http://matrix-synapse-chat.example.org:8008),
-      restart_policy: 'always'
-    )
-  }
-
-  # Connect to the Docker Network
-  it {
-    is_expected.to connect_docker_network('synapse-network-matrix-synapse-chat.example.org').with(
-      container: 'osl-irc-bridge'
+    is_expected.to create_file('/opt/synapse-chat.example.org/compose/docker-osl-irc-bridge.yaml').with(
+      owner: 'synapse',
+      group: 'synapse',
+      mode: '400',
+      sensitive: true
     )
   }
 end
 
-describe 'osl-matrix-test::synapse' do
+describe 'osl-matrix-test::synapse-no-quick' do
   cached(:subject) { chef_run }
   platform 'almalinux', '8'
   include_context 'pwnam'
@@ -123,7 +102,7 @@ describe 'osl-matrix-test::synapse' do
 
   # Appservice file
   it {
-    is_expected.to create_file('/opt/synapse-matrix-synapse-chat.example.org/osl-hookshot-webhook.yaml').with(
+    is_expected.to create_file('/opt/synapse-chat.example.org/appservice/osl-hookshot-webhook.yaml').with(
       owner: 'synapse',
       group: 'synapse',
       mode: '400',
@@ -134,7 +113,7 @@ describe 'osl-matrix-test::synapse' do
   # Generate passkey file
   it {
     is_expected.to run_execute('Generating Hookshot Passkey').with(
-      command: "openssl genpkey -out \"/opt/synapse-matrix-synapse-chat.example.org/keys/hookshot.pem\" -outform PEM -algorithm RSA -pkeyopt rsa_keygen_bits:4096; chmod 400 '/opt/synapse-matrix-synapse-chat.example.org/keys/hookshot.pem'",
+      command: "openssl genpkey -out \"/opt/synapse-chat.example.org/keys/hookshot.pem\" -outform PEM -algorithm RSA -pkeyopt rsa_keygen_bits:4096; chmod 400 '/opt/synapse-chat.example.org/keys/hookshot.pem'",
       user: 'synapse',
       group: 'synapse'
     )
@@ -142,7 +121,7 @@ describe 'osl-matrix-test::synapse' do
 
   # Generate config file
   it {
-    is_expected.to create_file('/opt/synapse-matrix-synapse-chat.example.org/osl-hookshot-webhook-config.yaml').with(
+    is_expected.to create_file('/opt/synapse-chat.example.org/osl-hookshot-webhook-config.yaml').with(
       owner: 'synapse',
       group: 'synapse',
       mode: '400',
@@ -150,23 +129,13 @@ describe 'osl-matrix-test::synapse' do
     )
   }
 
-  # Pull down the hookshot image
-  it { is_expected.to pull_docker_image('halfshot/matrix-hookshot') }
-
-  # Create docker container
+  # Create Hookshot compose file
   it {
-    is_expected.to run_docker_container('osl-hookshot-webhook').with(
-      repo: 'halfshot/matrix-hookshot',
-      user: '1001:',
-      port: %w(9000:9000 9001:9001 9002:9002),
-      restart_policy: 'always'
-    )
-  }
-
-  # Connect to the Docker Network
-  it {
-    is_expected.to connect_docker_network('synapse-network-matrix-synapse-chat.example.org').with(
-      container: 'osl-hookshot-webhook'
+    is_expected.to create_file('/opt/synapse-chat.example.org/compose/docker-osl-hookshot-webhook.yaml').with(
+      owner: 'synapse',
+      group: 'synapse',
+      mode: '400',
+      sensitive: true
     )
   }
 end

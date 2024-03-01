@@ -11,7 +11,9 @@ property :matrix_domain, String, name_property: true
 property :port, Integer, default: 8000
 
 action :create do
-  include_recipe 'osl-docker'
+  include_recipe 'osl-docker' do
+    notifies :restart, 'docker_container[element_webapp]'
+  end
 
   directory '/opt/element'
 
@@ -19,6 +21,7 @@ action :create do
     source 'element-config.json.erb'
     cookbook 'osl-matrix'
     variables(fqdn: new_resource.matrix_domain)
+    sensitive true
   end
 
   docker_image 'vectorim/element-web'

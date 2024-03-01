@@ -30,7 +30,7 @@ module OSLMatrix
             },
           ],
           'database' => osl_homeserver_db_defaults(pg_info),
-          'app_service_config_files' => appservices.map { |app| "/data/#{app}.yaml" },
+          'app_service_config_files' => appservices.map { |app| "/data/appservice/#{app}.yaml" },
           'registration_shared_secret_path' => '/data/keys/registration.key',
           'signing_key_path' => '/data/keys/signing.key',
         }
@@ -81,13 +81,23 @@ module OSLMatrix
 
         appservice_data['namespaces'] = namespace if namespace
 
-        file "#{new_resource.host_path}/#{new_resource.container_name}.yaml" do
-          content YAML.dump(appservice_data).lines[1..-1].join
+        file "#{new_resource.host_path}/appservice/#{new_resource.container_name}.yaml" do
+          content osl_yaml_dump(appservice_data)
           owner 'synapse'
           group 'synapse'
           mode '400'
           sensitive true
         end
+      end
+
+      # Convert Hash to YAML string, without file header
+      def osl_yaml_dump(hash_map)
+        YAML.dump(hash_map).lines[1..-1].join
+      end
+
+      # Get the UID and GID of the synapse user
+      def osl_synapse_user
+        "#{Etc.getpwnam('synapse').uid.to_s}:#{Etc.getpwnam('synapse').gid.to_s}"
       end
     end
   end
