@@ -1,5 +1,5 @@
 # Create a quick synapse server
-osl_synapse_quick 'chat.example.org' do
+osl_synapse_service 'chat.example.org' do
   appservices %w(hookshot heisenbridge)
   reg_key 'this-is-my-secret'
   config(

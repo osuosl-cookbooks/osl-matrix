@@ -1,5 +1,5 @@
-resource_name :osl_synapse_quick
-provides :osl_synapse_quick
+resource_name :osl_synapse_service
+provides :osl_synapse_service
 unified_mode true
 
 default_action :create

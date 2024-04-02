@@ -1,6 +1,6 @@
-# osl\_synapse\_quick
+# osl\_synapse\_service
 
-Quickly deploy a Matrix Synapse server, with available appservices, without needing extra resources.
+A wrapper resource to quickly deploy a Matrix Synapse server, with available appservices, without needing extra resources.
 
 **WARNING**: This resource is not responsible for setting up a secure web environment, please look into implementing `osl-apache` in your recipe to act as a reverse proxy.
 
@@ -40,7 +40,7 @@ Any missing properties with the `pg_` prefix will result in the server setting u
 ## Examples
 ```ruby
 # Host a basic Synapse server, with a PostgreSQL server located on the same VM
-osl_synapse_quick 'chat.example.org' do
+osl_synapse_service 'chat.example.org' do
   pg_host: '127.0.0.1'
   pg_name: 'synapse-data'
   pg_username: 'synapse-user'
@@ -48,7 +48,7 @@ osl_synapse_quick 'chat.example.org' do
 end
 
 # Synapse server with image embeding enabled, an increased file upload size, and Heisenbridge
-osl_synapse_quick 'chat.example.org' do
+osl_synapse_service 'chat.example.org' do
   appservices %w(heisenbridge)
   config({
     'max_upload_size': '1G',
