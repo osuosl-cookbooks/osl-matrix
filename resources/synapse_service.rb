@@ -13,7 +13,7 @@ property :pg_name, String
 property :pg_username, String
 property :pg_password, String
 property :port, Integer, default: 8008
-property :reg_key, String, default: lazy { osl_matrix_genkey(path + container_name) }
+property :reg_key, String, default: lazy { osl_matrix_genkey(domain) }
 property :tag, String, default: 'latest'
 property :tag_heisenbridge, String, default: 'latest'
 property :tag_hookshot, String, default: 'latest'
