@@ -24,6 +24,9 @@ suites:
   - name: synapse
     run_list:
       - recipe[osl-matrix-test::synapse]
+  - name: synapse-ala-carte
+    run_list:
+      - recipe[osl-matrix-test::synapse-no-quick]
   - name: element
     run_list:
       - recipe[osl-matrix-test::element]
