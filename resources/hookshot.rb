@@ -42,7 +42,7 @@ action :create do
     # Add the userIDPrefix
     arrAppServiceUsers.push({
       'exclusive' => true,
-      'regex' => "@#{val['userIdPrefix']}_.*",
+      'regex' => "@#{val['userIdPrefix']}.*",
     })
   end
 

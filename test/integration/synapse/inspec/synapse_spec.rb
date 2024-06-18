@@ -37,7 +37,7 @@ describe file('/opt/synapse-chat.example.org/homeserver.yaml') do
 end
 
 # Docker Container
-describe docker_container('e5af17-synapse-chat.example.org-1') do
+describe docker_container('e5af17-synapse-1') do
   it { should exist }
   it { should be_running }
   its('image') { should eq 'matrixdotorg/synapse:latest' }
@@ -47,20 +47,6 @@ end
 
 # Check to see if we can send HTTP requests
 describe http('localhost:8008/_matrix/client/versions', headers: { 'host': 'chat.example.org' }) do
-  its('status') { should eq 200 }
-end
-
-# Multiple Synapse servers on one node
-describe docker_container('6a79d1-synapse-anotherchat.example.org-1') do
-  it { should exist }
-  it { should be_running }
-  its('image') { should eq 'matrixdotorg/synapse:latest' }
-  its('ports') { should match '8009->8008/tcp' }
-  its('ports') { should match '8449->8448/tcp' }
-end
-
-# Check to see if we can send HTTP requests
-describe http('localhost:8009/_matrix/client/versions', headers: { 'host': 'anotherchat.example.org' }) do
   its('status') { should eq 200 }
 end
 

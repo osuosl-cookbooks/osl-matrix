@@ -80,7 +80,7 @@ action :create do
 
   config_compose = {
     'services' => {
-      new_resource.container_name => {
+      'synapse' => {
         'image' => "matrixdotorg/synapse:#{new_resource.tag}",
         'ports' => ["#{new_resource.port}:8008", "#{new_resource.fed_port}:8448"],
         'volumes' => [
