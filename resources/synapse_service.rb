@@ -5,15 +5,16 @@ unified_mode true
 default_action :create
 
 property :appservices, Array, default: []
-property :config, Hash
-property :config_hookshot, Hash
+property :config, Hash, default: {}
+property :config_hookshot, Hash, default: {}
 property :domain, String, name_property: true
 property :pg_host, String
 property :pg_name, String
 property :pg_username, String
 property :pg_password, String
 property :port, Integer, default: 8008
-property :reg_key, String, default: lazy { osl_matrix_genkey(path + container_name) }
+property :fed_port, Integer, default: 8448
+property :reg_key, String, default: lazy { osl_matrix_genkey(domain) }
 property :tag, String, default: 'latest'
 property :tag_heisenbridge, String, default: 'latest'
 property :tag_hookshot, String, default: 'latest'
@@ -21,12 +22,13 @@ property :sensitive, [true, false], default: true
 
 action :create do
   synapse_path = "/opt/synapse-#{new_resource.domain}"
+  compose_unique = osl_matrix_genkey(synapse_path)[0..5]
 
   compose_files = new_resource.appservices.map { |appservice| "docker-#{appservice}.yaml" }
   compose_files.push('docker-synapse.yaml')
 
   # Run the docker compose, but only do so after the converge finishes everything else
-  osl_dockercompose 'synapse' do
+  osl_dockercompose compose_unique do
     directory "#{synapse_path}/compose"
     config compose_files
     action :nothing
@@ -41,9 +43,10 @@ action :create do
     pg_username new_resource.pg_username
     pg_password new_resource.pg_password
     port new_resource.port
+    fed_port new_resource.fed_port
     reg_key new_resource.reg_key
     tag new_resource.tag
-    notifies :rebuild, 'osl_dockercompose[synapse]'
+    notifies :rebuild, "osl_dockercompose[#{compose_unique}]"
   end
 
   # Check to see if we are initalizing any addons
@@ -51,7 +54,7 @@ action :create do
     host_domain new_resource.domain
     tag new_resource.tag_heisenbridge
     only_if { new_resource.appservices.include?('heisenbridge') }
-    notifies :rebuild, 'osl_dockercompose[synapse]'
+    notifies :rebuild, "osl_dockercompose[#{compose_unique}]"
   end
 
   osl_hookshot 'hookshot' do
@@ -59,6 +62,6 @@ action :create do
     config new_resource.config_hookshot
     tag new_resource.tag_hookshot
     only_if { new_resource.appservices.include?('hookshot') }
-    notifies :rebuild, 'osl_dockercompose[synapse]'
+    notifies :rebuild, "osl_dockercompose[#{compose_unique}]"
   end
 end

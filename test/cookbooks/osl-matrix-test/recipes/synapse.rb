@@ -27,7 +27,7 @@ osl_synapse_service 'chat.example.org' do
       'generic' => {
         'enabled' => true,
         'urlPrefix' => 'http://chat.example.org/webhook',
-        'userIdPrefix' => 'example-hook',
+        'userIdPrefix' => 'example-hook_',
       },
     }
   )

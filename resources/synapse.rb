@@ -14,6 +14,7 @@ property :pg_name, String
 property :pg_username, String
 property :pg_password, String
 property :port, Integer, default: 8008
+property :fed_port, Integer, default: 8448
 property :reg_key, String, default: lazy { osl_matrix_genkey(path + container_name) }
 property :tag, String, default: 'latest'
 property :sensitive, [true, false], default: true
@@ -81,7 +82,7 @@ action :create do
     'services' => {
       'synapse' => {
         'image' => "matrixdotorg/synapse:#{new_resource.tag}",
-        'ports' => ["#{new_resource.port}:8008", '8448:8448'],
+        'ports' => ["#{new_resource.port}:8008", "#{new_resource.fed_port}:8448"],
         'volumes' => [
           "#{new_resource.path}:/data",
         ],

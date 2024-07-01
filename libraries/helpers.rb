@@ -38,15 +38,15 @@ module OSLMatrix
 
       # Generate the default configuration for a homeserver's database settings
       def osl_homeserver_db_defaults(pg_info)
-        if pg_info['username'] && pg_info['password'] && pg_info['database'] && pg_info['host']
+        if pg_info[:username] && pg_info[:password] && pg_info[:database] && pg_info[:host]
           # Connect to PosgreSQL server
           {
             'name' => 'psycopg2',
             'args' => {
-              'user' => pg_info['username'],
-              'password' => pg_info['password'],
-              'database' => pg_info['database'],
-              'host' => pg_info['host'],
+              'user' => pg_info[:username],
+              'password' => pg_info[:password],
+              'database' => pg_info[:database],
+              'host' => pg_info[:host],
               'cp_min' => 5,
               'cp_max' => 10,
             },

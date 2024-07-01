@@ -30,14 +30,14 @@ describe file('/opt/synapse-chat.example.org/homeserver.yaml') do
   its('owner') { should eq 'synapse' }
   its('content') { should match 'server_name: chat.example.org' }
   its('content') { should match 'media_store_path: "/data/media_store"' }
-  its('content') { should match '/data/appservice/heisenbridge.yaml' }
-  its('content') { should match '/data/appservice/hookshot.yaml' }
+  its('content') { should match '/data/appservice/osl-irc-bridge.yaml' }
+  its('content') { should match '/data/appservice/osl-hookshot-webhook.yaml' }
   its('content') { should match 'module: ldap_auth_provider.LdapAuthProviderModule' }
-  its('content') { should match 'database: "/data/homeserver-sqlite.db"' }
+  its('content') { should match 'name: psycopg2' }
 end
 
 # Docker Container
-describe docker_container('e5af17-synapse-1') do
+describe docker_container('synapse-synapse-1') do
   it { should exist }
   it { should be_running }
   its('image') { should eq 'matrixdotorg/synapse:latest' }
@@ -53,15 +53,15 @@ end
 # Heisenbridge Appservice
 
 # Heisenbridge Appservice Configuration
-describe file('/opt/synapse-chat.example.org/appservice/heisenbridge.yaml') do
+describe file('/opt/synapse-chat.example.org/appservice/osl-irc-bridge.yaml') do
   it { should exist }
   its('owner') { should eq 'synapse' }
   its('content') { should match 'id: heisenbridge' }
-  its('content') { should match 'url: http://heisenbridge:9898' }
+  its('content') { should match 'url: http://osl-irc-bridge:9898' }
 end
 
 # Docker Container
-describe docker_container('e5af17-heisenbridge-1') do
+describe docker_container('synapse-osl-irc-bridge-1') do
   it { should exist }
   it { should be_running }
   its('image') { should eq 'hif1/heisenbridge:latest' }
@@ -70,14 +70,14 @@ end
 # Hookshot Appservice
 
 # Hookshot Appservice Configuration
-describe file('/opt/synapse-chat.example.org/appservice/hookshot.yaml') do
+describe file('/opt/synapse-chat.example.org/appservice/osl-hookshot-webhook.yaml') do
   it { should exist }
   its('owner') { should eq 'synapse' }
   its('content') { should match 'id: hookshot' }
-  its('content') { should match 'url: http://hookshot:9993' }
+  its('content') { should match 'url: http://osl-hookshot-webhook:9993' }
 end
 
-describe file('/opt/synapse-chat.example.org/hookshot-config.yaml') do
+describe file('/opt/synapse-chat.example.org/osl-hookshot-webhook-config.yaml') do
   it { should exist }
   its('owner') { should eq 'synapse' }
   its('content') { should match 'generic:\n  enabled: true' }
@@ -91,7 +91,7 @@ describe file('/opt/synapse-chat.example.org/keys/hookshot.pem') do
 end
 
 # Docker Container
-describe docker_container('e5af17-hookshot-1') do
+describe docker_container('synapse-osl-hookshot-webhook-1') do
   it { should exist }
   it { should be_running }
   its('image') { should eq 'halfshot/matrix-hookshot:latest' }
