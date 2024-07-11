@@ -70,7 +70,7 @@ action :create do
   # Passkey settings
   # Not usually needed to be modified by user, as we generate our own, but just in case.
   config.merge!({
-    'passFile' => '/data/hookshot.pem',
+    'passFile' => '/data/keys/hookshot.pem',
   }) { |_key, old_value, new_value| old_value || new_value }
 
   # Bridge settings
@@ -149,7 +149,7 @@ action :create do
         'volumes' => [
           "#{new_resource.host_path}/appservice/#{new_resource.container_name}.yaml:/data/registration.yml",
           "#{new_resource.host_path}/#{new_resource.container_name}-config.yaml:/data/config.yml",
-          "#{new_resource.host_path}/keys/hookshot.pem:/data/hookshot.pem",
+          "#{new_resource.host_path}/keys:/data/keys",
         ],
         'user' => osl_synapse_user,
         'restart' => 'always',
