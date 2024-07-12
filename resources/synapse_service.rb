@@ -8,7 +8,7 @@ property :appservices, Array, default: []
 property :config, Hash, default: {}
 property :config_hookshot, Hash, default: {}
 property :domain, String, name_property: true
-property :key_github, String, default: nil
+property :key_github, String
 property :pg_host, String
 property :pg_name, String
 property :pg_username, String
