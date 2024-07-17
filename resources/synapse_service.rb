@@ -8,6 +8,7 @@ property :appservices, Array, default: []
 property :config, Hash, default: {}
 property :config_hookshot, Hash, default: {}
 property :domain, String, name_property: true
+property :key_github, String
 property :pg_host, String
 property :pg_name, String
 property :pg_username, String
@@ -61,6 +62,7 @@ action :create do
     host_domain new_resource.domain
     config new_resource.config_hookshot
     tag new_resource.tag_hookshot
+    key_github new_resource.key_github
     only_if { new_resource.appservices.include?('hookshot') }
     notifies :rebuild, "osl_dockercompose[#{compose_unique}]"
   end

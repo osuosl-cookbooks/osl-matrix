@@ -20,6 +20,7 @@ property :host_name, String, default: lazy { "synapse-#{host_domain}" }
 property :host_path, String, default: lazy { "/opt/#{host_name}" }
 property :key_appservice, String, default: lazy { osl_matrix_genkey(host_name + container_name) }
 property :key_homeserver, String, default: lazy { osl_matrix_genkey(container_name + host_name) }
+property :key_github, String
 property :tag, String, default: 'latest'
 property :sensitive, [true, false], default: true
 
@@ -119,6 +120,20 @@ action :create do
     },
   ]
 
+  # Check to see if we should add a github key
+  if new_resource.key_github
+    # We have a github key, add the file, and append the key to the config
+    file "#{new_resource.host_path}/#{new_resource.container_name}/keys/github-key.pem" do
+      content new_resource.key_github
+      owner 'synapse'
+      group 'synapse'
+      mode '400'
+      sensitive true
+    end
+
+    config['github']['auth']['privateKeyFile'] = new_resource.key_github
+  end
+
   # Generate Passkey for encrypting tokens
   execute 'Generating Hookshot Passkey' do
     command "openssl genpkey -out \"#{new_resource.host_path}/keys/hookshot.pem\" -outform PEM -algorithm RSA -pkeyopt rsa_keygen_bits:4096; chmod 400 '#{new_resource.host_path}/keys/hookshot.pem'"
@@ -149,7 +164,8 @@ action :create do
         'volumes' => [
           "#{new_resource.host_path}/appservice/#{new_resource.container_name}.yaml:/data/registration.yml",
           "#{new_resource.host_path}/#{new_resource.container_name}-config.yaml:/data/config.yml",
-          "#{new_resource.host_path}/keys:/data/keys",
+          "#{new_resource.host_path}/keys/hookshot.pem:/data/keys/hookshot.pem",
+          "#{new_resource.host_path}/keys/github-key.pem:/data/keys/github-key.pem",
         ],
         'user' => osl_synapse_user,
         'restart' => 'always',
