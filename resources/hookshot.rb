@@ -123,7 +123,7 @@ action :create do
   # Check to see if we should add a github key
   if new_resource.key_github
     # We have a github key, add the file, and append the key to the config
-    file "#{new_resource.host_path}/#{new_resource.container_name}/keys/github-key.pem" do
+    file "#{new_resource.host_path}/keys/github-key.pem" do
       content new_resource.key_github
       owner 'synapse'
       group 'synapse'
