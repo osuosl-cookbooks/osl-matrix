@@ -131,7 +131,7 @@ action :create do
       sensitive true
     end
 
-    config['github']['auth']['privateKeyFile'] = new_resource.key_github
+    config['github']['auth']['privateKeyFile'] = '/data/keys/github-key.pem'
   end
 
   # Generate Passkey for encrypting tokens
