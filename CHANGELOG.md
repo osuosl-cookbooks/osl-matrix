@@ -2,6 +2,10 @@
 
 This file is used to list changes made in each version of the osl-matrix cookbook.
 
+1.1.3 (2024-08-14)
+------------------
+- Give path instead of key in config
+
 1.1.2 (2024-08-13)
 ------------------
 - Patching github key feature
