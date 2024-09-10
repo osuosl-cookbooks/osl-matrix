@@ -7,6 +7,7 @@ default_action :create
 property :appservices, Array, default: []
 property :config, Hash, default: {}
 property :config_hookshot, Hash, default: {}
+property :config_matrix_irc, Hash, default: {}
 property :domain, String, name_property: true
 property :key_github, String
 property :pg_host, String
@@ -19,6 +20,7 @@ property :reg_key, String, default: lazy { osl_matrix_genkey(domain) }
 property :tag, String, default: 'latest'
 property :tag_heisenbridge, String, default: 'latest'
 property :tag_hookshot, String, default: 'latest'
+property :tag_matrix_irc, String, default: 'latest'
 property :sensitive, [true, false], default: true
 
 action :create do
@@ -64,6 +66,14 @@ action :create do
     tag new_resource.tag_hookshot
     key_github new_resource.key_github
     only_if { new_resource.appservices.include?('hookshot') }
+    notifies :rebuild, "osl_dockercompose[#{compose_unique}]"
+  end
+
+  osl_matrix_irc 'matrix-appservice-irc' do
+    host_domain new_resource.domain
+    config new_resource.config_matrix_irc
+    tag new_resource.tag_matrix_irc
+    only_if { new_resource.appservices.include?('matrix-appservice-irc') }
     notifies :rebuild, "osl_dockercompose[#{compose_unique}]"
   end
 end

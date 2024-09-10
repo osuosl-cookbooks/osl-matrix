@@ -94,6 +94,7 @@ describe 'osl-matrix-test::synapse-no-quick' do
   }
 end
 
+# osl_hookshot
 describe 'osl-matrix-test::synapse-no-quick' do
   cached(:subject) { chef_run }
   platform 'almalinux', '8'
@@ -132,6 +133,60 @@ describe 'osl-matrix-test::synapse-no-quick' do
   # Create Hookshot compose file
   it {
     is_expected.to create_file('/opt/synapse-chat.example.org/compose/docker-osl-hookshot-webhook.yaml').with(
+      owner: 'synapse',
+      group: 'synapse',
+      mode: '400',
+      sensitive: true
+    )
+  }
+end
+
+# osl_matrix_irc
+describe 'osl-matrix-test::synapse-no-quick' do
+  cached(:subject) { chef_run }
+  platform 'almalinux', '8'
+  include_context 'pwnam'
+  step_into :osl_matrix_irc
+
+  # Appservice file
+  it {
+    is_expected.to create_file('/opt/synapse-chat.example.org/appservice/osl-matrix-irc.yaml').with(
+      owner: 'synapse',
+      group: 'synapse',
+      mode: '400',
+      sensitive: true
+    )
+  }
+
+  # Generate passkey file
+  it {
+    is_expected.to run_execute('Generating Matrix-Appservice-IRC Passkey').with(
+      command: "openssl genpkey -out \"/opt/synapse-chat.example.org/keys/irc-passkey.pem\" -outform PEM -algorithm RSA -pkeyopt rsa_keygen_bits:2048; chmod 400 '/opt/synapse-chat.example.org/keys/irc-passkey.pem'",
+      user: 'synapse',
+      group: 'synapse'
+    )
+  }
+
+  # Generate signing key file
+  it {
+    is_expected.to run_execute('Generate signingkey').with(
+      command: 'docker run --rm --entrypoint "sh" --volume /opt/synapse-chat.example.org/keys:/data --user 994:989 matrixdotorg/matrix-appservice-irc "-c" "node lib/generate-signing-key.js > /data/signingkey.jwk && chmod 400 /data/signingkey.jwk"'
+    )
+  }
+
+  # Generate config file
+  it {
+    is_expected.to create_file('/opt/synapse-chat.example.org/osl-matrix-irc-config.yaml').with(
+      owner: 'synapse',
+      group: 'synapse',
+      mode: '400',
+      sensitive: true
+    )
+  }
+
+  # Create matrix-appservice-irc compose file
+  it {
+    is_expected.to create_file('/opt/synapse-chat.example.org/compose/docker-osl-matrix-irc.yaml').with(
       owner: 'synapse',
       group: 'synapse',
       mode: '400',

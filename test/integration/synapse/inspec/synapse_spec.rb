@@ -97,3 +97,46 @@ describe docker_container('e5af17-hookshot-1') do
   its('image') { should eq 'halfshot/matrix-hookshot:latest' }
   its('ports') { should match '9000-9002->9000-9002/tcp' }
 end
+
+# Matrix-Appservice-IRC Appservice
+
+# Matrix-IRC Appservice Configuration
+describe file('/opt/synapse-chat.example.org/appservice/matrix-appservice-irc.yaml') do
+  it { should exist }
+  its('owner') { should eq 'synapse' }
+  its('content') { should match 'id: matrix-appservice-irc' }
+  its('content') { should match 'url: http://matrix-appservice-irc:8090' }
+end
+
+# Docker Container
+describe docker_container('e5af17-matrix-appservice-irc-1') do
+  it { should exist }
+  it { should be_running }
+  its('image') { should eq 'matrixdotorg/matrix-appservice-irc:latest' }
+end
+
+# Config File
+describe file('/opt/synapse-chat.example.org/matrix-appservice-irc-config.yaml') do
+  it { should exist }
+  its('owner') { should eq 'synapse' }
+  its('mode') { should cmp '0400' }
+end
+
+# IRC key
+describe file('/opt/synapse-chat.example.org/keys/irc-passkey.pem') do
+  it { should exist }
+  its('owner') { should eq 'synapse' }
+  its('mode') { should cmp '0400' }
+end
+
+# Media signing key
+describe file('/opt/synapse-chat.example.org/keys/signingkey.jwk') do
+  it { should exist }
+  its('owner') { should eq 'synapse' }
+  its('mode') { should cmp '0400' }
+end
+
+# Postgres data directory
+describe file('/opt/synapse-chat.example.org/appservice-data/matrix-appservice-irc-postgres/postgresql.conf') do
+  it { should exist }
+end

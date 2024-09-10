@@ -1,6 +1,6 @@
 # Create a quick synapse server
 osl_synapse_service 'chat.example.org' do
-  appservices %w(hookshot heisenbridge)
+  appservices %w(hookshot heisenbridge matrix-appservice-irc)
   reg_key 'this-is-my-secret'
   config(
     {
@@ -31,4 +31,11 @@ osl_synapse_service 'chat.example.org' do
       },
     }
   )
+  config_matrix_irc({
+    'ircService' => {
+      'servers' => {
+        'ircd' => {},
+      },
+    },
+  })
 end
