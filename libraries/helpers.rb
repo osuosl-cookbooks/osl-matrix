@@ -1,6 +1,11 @@
 module OSLMatrix
   module Cookbook
     module Helpers
+
+      # Class function override for Hashes.
+      # Traditional merge does not merge any child Hashes.
+      # deep_merge allows for recursively merging child Hashes.
+      # Code taken from: https://stackoverflow.com/a/9381776
       class ::Hash
         def deep_merge(second)
           merger = proc { |_key, v1, v2| v1.is_a?(Hash) && v2.is_a?(Hash) ? v1.merge(v2, &merger) : v2 }
