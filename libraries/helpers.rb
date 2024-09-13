@@ -1,7 +1,6 @@
 module OSLMatrix
   module Cookbook
     module Helpers
-
       # Class function override for Hashes.
       # Traditional merge does not merge any child Hashes.
       # deep_merge allows for recursively merging child Hashes.
