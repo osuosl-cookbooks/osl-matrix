@@ -1,6 +1,17 @@
 module OSLMatrix
   module Cookbook
     module Helpers
+      # Class function override for Hashes.
+      # Traditional merge does not merge any child Hashes.
+      # deep_merge allows for recursively merging child Hashes.
+      # Code taken from: https://stackoverflow.com/a/9381776
+      class ::Hash
+        def deep_merge(second)
+          merger = proc { |_key, v1, v2| v1.is_a?(Hash) && v2.is_a?(Hash) ? v1.merge(v2, &merger) : v2 }
+          merge(second, &merger)
+        end
+      end
+
       # Generate a secret key through hashing a string. Mainly used when wanting a registration key
       # WARNING: Not recommended for an actual deployment, only done when no secret is given.
       def osl_matrix_genkey(plain_text)
@@ -82,6 +93,70 @@ module OSLMatrix
             },
           }
         end
+      end
+
+      # Generate the default configuration for matrix-appservice-irc
+      def osl_matrix_irc_defaults(custom_config)
+        default_config = {
+          'homeserver' => {
+            'url' => 'http://synapse:8008',
+            'domain' => new_resource.host_domain,
+          },
+          'ircService' => {
+            'passwordEncryptionKeyPath' => '/data/passkey.pem',
+            'mediaProxy' => {
+              'signingKeyPath' => '/data/signingkey.jwk',
+              'ttlSeconds' => 3600,
+              'bindPort' => 11111,
+              'publicUrl' => 'http://irc-media-proxy-not-implemented.localhost',
+            },
+            'permissions' => {
+              new_resource.host_domain => 'admin',
+            },
+          },
+          'database' => {
+            'engine' => 'postgres',
+            'connectionString' => "postgres://postgres:#{osl_matrix_genkey(new_resource.container_name)}@#{new_resource.container_name}-postgres:5432/postgres",
+          },
+        }.deep_merge(custom_config)
+
+        # Loop over all IRC servers, adding their defaults.
+        begin
+          custom_config['ircService']['servers'].each do |server, server_config|
+            default_config['ircService']['servers'][server] = osl_matrix_irc_server_defaults(server_config)
+          end
+        rescue
+          # No servers given
+        end
+
+        # Do a final merge
+        osl_yaml_dump(default_config)
+      end
+
+      # Generate the default configuration for every IRC server
+      def osl_matrix_irc_server_defaults(custom_config)
+        {
+          'name' => 'Untitled IRC Server',
+          'botConfig' => {
+            'enabled' => true,
+            'username' => 'oslmatrixbot',
+          },
+          'dynamicChannels' => {
+            'enabled' => true,
+            'published' => false,
+          },
+          'matrixClients' => {
+            'userTemplate' => '@as-irc_$NICK',
+          },
+          'ircClients' => {
+            'nickTemplate' => '$DISPLAY[OSL-Matrix]',
+            'kickOn' => {
+              'channelJoinFailure' => true,
+              'ircConnectionFailure' => true,
+              'userQuit' => true,
+            },
+          },
+        }.deep_merge(custom_config)
       end
 
       # Get the name of the synapse docker container name, given the name of the synapse resource which creates it

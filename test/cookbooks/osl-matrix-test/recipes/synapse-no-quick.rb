@@ -2,7 +2,7 @@ include_recipe 'osl-docker'
 
 # Create the synapse docker container
 osl_synapse 'chat.example.org' do
-  appservices %w(osl-irc-bridge osl-hookshot-webhook)
+  appservices %w(osl-irc-bridge osl-hookshot-webhook osl-matrix-irc)
   reg_key 'this-is-my-secret'
   pg_host 'postgres'
   pg_name 'synapse'
@@ -28,6 +28,19 @@ osl_synapse 'chat.example.org' do
       ],
     }
   )
+  sensitive false
+end
+
+# Matrix-Appservice-IRC App Service
+osl_matrix_irc 'osl-matrix-irc' do
+  host_domain 'chat.example.org'
+  config({
+    'ircService' => {
+      'servers' => {
+        'ircd' => {},
+      },
+    },
+  })
   sensitive false
 end
 
@@ -59,8 +72,8 @@ osl_hookshot 'osl-hookshot-webhook' do
   })
 end
 
-# Postgres server
-file '/opt/synapse-chat.example.org/compose/docker-postgres.yaml' do
+# Additional servers for testing
+file '/opt/synapse-chat.example.org/compose/docker-addons.yaml' do
   content osl_yaml_dump({
     'services' => {
       'postgres' => {
@@ -70,6 +83,9 @@ file '/opt/synapse-chat.example.org/compose/docker-postgres.yaml' do
           'POSTGRES_USER' => 'synapse',
           'POSTGRES_INITDB_ARGS' => '--encoding=UTF8 --locale=C',
         },
+      },
+      'ircd' => {
+        'image' => 'inspircd/inspircd-docker',
       },
     },
   })
@@ -81,11 +97,5 @@ end
 # Run the docker compose
 osl_dockercompose 'synapse' do
   directory '/opt/synapse-chat.example.org/compose'
-  config %w(docker-postgres.yaml docker-synapse.yaml docker-osl-irc-bridge.yaml docker-osl-hookshot-webhook.yaml)
-end
-
-# Run the docker compose
-osl_dockercompose 'synapse' do
-  directory '/opt/synapse-chat.example.org/compose'
-  config %w(docker-synapse.yaml)
+  config %w(docker-addons.yaml docker-synapse.yaml docker-osl-irc-bridge.yaml docker-osl-hookshot-webhook.yaml docker-osl-matrix-irc.yaml)
 end
