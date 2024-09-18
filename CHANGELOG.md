@@ -2,6 +2,10 @@
 
 This file is used to list changes made in each version of the osl-matrix cookbook.
 
+1.2.0 (2024-09-18)
+------------------
+- Added matrix-appservice-irc appservice resource
+
 1.1.3 (2024-08-14)
 ------------------
 - Give path instead of key in config
