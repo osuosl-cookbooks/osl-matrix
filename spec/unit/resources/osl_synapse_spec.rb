@@ -170,7 +170,7 @@ describe 'osl-matrix-test::synapse-no-quick' do
   # Generate signing key file
   it {
     is_expected.to run_execute('Generate signingkey').with(
-      command: 'docker run --rm --entrypoint "sh" --volume /opt/synapse-chat.example.org/keys:/data --user 994:989 matrixdotorg/matrix-appservice-irc "-c" "node lib/generate-signing-key.js > /data/signingkey.jwk && chmod 400 /data/signingkey.jwk"'
+      command: 'docker run --rm --entrypoint "sh" --volume /opt/synapse-chat.example.org/keys:/data --user 1001: matrixdotorg/matrix-appservice-irc "-c" "node lib/generate-signing-key.js > /data/signingkey.jwk && chmod 400 /data/signingkey.jwk"'
     )
   }
 

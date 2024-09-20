@@ -77,7 +77,7 @@ action :create do
   #    not_if { ::File.exist?("#{new_resource.host_path}/keys/irc-signingkey.jwk") }
   #  end
   execute 'Generate signingkey' do
-    command "docker run --rm --entrypoint \"sh\" --volume #{new_resource.host_path}/keys:/data --user 994:989 matrixdotorg/matrix-appservice-irc \"-c\" \"node lib/generate-signing-key.js > /data/signingkey.jwk && chmod 400 /data/signingkey.jwk\""
+    command "docker run --rm --entrypoint \"sh\" --volume #{new_resource.host_path}/keys:/data --user #{osl_synapse_user} matrixdotorg/matrix-appservice-irc \"-c\" \"node lib/generate-signing-key.js > /data/signingkey.jwk && chmod 400 /data/signingkey.jwk\""
     creates "#{new_resource.host_path}/keys/signingkey.jwk"
   end
 
