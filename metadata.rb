@@ -6,7 +6,7 @@ description       'Creates and manages a matrix synapse service for the Open Sou
 issues_url        'https://github.com/osuosl-cookbooks/osl-matrix/issues'
 source_url        'https://github.com/osuosl-cookbooks/osl-matrix'
 chef_version      '>= 17.0'
-version           '1.2.1'
+version           '1.2.2'
 
 supports          'almalinux', '~> 8.0'
 

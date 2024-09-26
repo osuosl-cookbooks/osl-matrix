@@ -2,6 +2,10 @@
 
 This file is used to list changes made in each version of the osl-matrix cookbook.
 
+1.2.2 (2024-09-26)
+------------------
+- Use saner defaults
+
 1.2.1 (2024-09-20)
 ------------------
 - Emergency Patch for matrix-appservice-irc
