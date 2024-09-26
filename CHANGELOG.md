@@ -2,6 +2,10 @@
 
 This file is used to list changes made in each version of the osl-matrix cookbook.
 
+1.3.0 (2024-09-26)
+------------------
+- Allow the IRC users regex to be configurable
+
 1.2.2 (2024-09-26)
 ------------------
 - Use saner defaults
