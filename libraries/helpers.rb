@@ -173,7 +173,7 @@ module OSLMatrix
           'url' => url,
           'as_token' => appservicekey,
           'hs_token' => homeserverkey,
-          'rate_limited' => 'false',
+          'rate_limited' => false,
           'sender_localpart' => service,
         }
 
