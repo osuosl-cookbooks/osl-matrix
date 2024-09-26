@@ -144,12 +144,13 @@ module OSLMatrix
           'dynamicChannels' => {
             'enabled' => true,
             'published' => false,
+            'aliasTemplate' => '#irc_$SERVER_$CHANNEL',
           },
           'matrixClients' => {
-            'userTemplate' => '@as-irc_$NICK',
+            'userTemplate' => '@$SERVER_$NICK',
           },
           'ircClients' => {
-            'nickTemplate' => '$DISPLAY[OSL-Matrix]',
+            'nickTemplate' => '$DISPLAY[m]',
             'kickOn' => {
               'channelJoinFailure' => true,
               'ircConnectionFailure' => true,
