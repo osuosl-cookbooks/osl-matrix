@@ -18,6 +18,7 @@ property :key_appservice, String, default: lazy { osl_matrix_genkey(host_name + 
 property :key_homeserver, String, default: lazy { osl_matrix_genkey(container_name + host_name) }
 property :tag, String, default: 'latest'
 property :sensitive, [true, false], default: true
+property :users_regex, String, default: '@as-irc_.*'
 
 action :create do
   # Pull down the latest version
@@ -36,7 +37,7 @@ action :create do
       'users' => [
         {
           'exclusive' => true,
-          'regex' => '@as-irc_.*',
+          'regex' => new_resource.users_regex,
         },
       ],
       'rate_limited' => false,

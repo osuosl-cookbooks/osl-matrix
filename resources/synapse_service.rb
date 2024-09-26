@@ -9,6 +9,7 @@ property :config, Hash, default: {}
 property :config_hookshot, Hash, default: {}
 property :config_matrix_irc, Hash, default: {}
 property :domain, String, name_property: true
+property :irc_users_regex, String, default: '@as-irc_.*'
 property :key_github, String
 property :pg_host, String
 property :pg_name, String
@@ -50,6 +51,7 @@ action :create do
     reg_key new_resource.reg_key
     tag new_resource.tag
     notifies :rebuild, "osl_dockercompose[#{compose_unique}]"
+    notifies :restart, "osl_dockercompose[#{compose_unique}]"
   end
 
   # Check to see if we are initalizing any addons
@@ -58,6 +60,7 @@ action :create do
     tag new_resource.tag_heisenbridge
     only_if { new_resource.appservices.include?('heisenbridge') }
     notifies :rebuild, "osl_dockercompose[#{compose_unique}]"
+    notifies :restart, "osl_dockercompose[#{compose_unique}]"
   end
 
   osl_hookshot 'hookshot' do
@@ -67,13 +70,16 @@ action :create do
     key_github new_resource.key_github
     only_if { new_resource.appservices.include?('hookshot') }
     notifies :rebuild, "osl_dockercompose[#{compose_unique}]"
+    notifies :restart, "osl_dockercompose[#{compose_unique}]"
   end
 
   osl_matrix_irc 'matrix-appservice-irc' do
     host_domain new_resource.domain
     config new_resource.config_matrix_irc
     tag new_resource.tag_matrix_irc
+    users_regex new_resource.irc_users_regex
     only_if { new_resource.appservices.include?('matrix-appservice-irc') }
     notifies :rebuild, "osl_dockercompose[#{compose_unique}]"
+    notifies :restart, "osl_dockercompose[#{compose_unique}]"
   end
 end
