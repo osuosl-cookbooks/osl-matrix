@@ -22,7 +22,7 @@ action :create do
   end
 
   file '/opt/synapse_admin/config.json' do
-    content JSON.dump({'restrictBaseUrl' => new_resource.matrix_domain})
+    content JSON.dump({ 'restrictBaseUrl' => new_resource.matrix_domain })
     only_if { new_resource.force_domain }
   end
 

@@ -2,7 +2,7 @@
 # Cookbook:: osl-matrix
 # Spec:: osl_element
 #
-# Copyright:: 2023-2024, Oregon State University
+# Copyright:: 2023-2025, Oregon State University
 #
 
 require_relative '../../spec_helper'
