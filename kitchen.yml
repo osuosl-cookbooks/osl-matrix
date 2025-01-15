@@ -30,3 +30,6 @@ suites:
   - name: element
     run_list:
       - recipe[osl-matrix-test::element]
+  - name: synapse-admin
+    run_list:
+      - recipe[osl-matrix-test::synapse-admin]
