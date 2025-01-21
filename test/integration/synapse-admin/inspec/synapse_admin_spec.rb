@@ -8,11 +8,11 @@ end
 
 # Site's config
 
-describe directory('/opt/synapse_admin') do
+describe directory('/opt/synapse_admin_test_admin') do
   it { should exist }
 end
 
-describe file('/opt/synapse_admin/config.json') do
+describe file('/opt/synapse_admin_test_admin/config.json') do
   it { should exist }
   its('content') { should match '"restrictBaseUrl":"chat.example.org"' }
 end

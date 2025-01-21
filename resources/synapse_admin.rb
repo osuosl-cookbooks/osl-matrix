@@ -8,29 +8,29 @@ unified_mode true
 
 default_action :create
 
-property :matrix_domain, String, name_property: true
+property :docker_container, String, name_property: true
+property :home_server, [String, Array]
 property :port, Integer, default: 8080
-property :force_domain, [true, false], default: false
 
 action :create do
-  include_recipe 'osl-docker' do
-    notifies :restart, 'docker_container[synapse_admin_webapp]'
+  include_recipe 'osl-docker'
+
+  directory "/opt/synapse_admin_#{new_resource.docker_container}" do
+    only_if { new_resource.home_server }
   end
 
-  directory '/opt/synapse_admin' do
-    only_if { new_resource.force_domain }
+  file "/opt/synapse_admin_#{new_resource.docker_container}/config.json" do
+    content JSON.dump({ 'restrictBaseUrl' => new_resource.home_server })
+    only_if { new_resource.home_server }
   end
 
-  file '/opt/synapse_admin/config.json' do
-    content JSON.dump({ 'restrictBaseUrl' => new_resource.matrix_domain })
-    only_if { new_resource.force_domain }
+  docker_image 'awesometechnologies/synapse-admin' do
+    notifies :redeploy, "docker_container[#{new_resource.docker_container}]"
   end
 
-  docker_image 'awesometechnologies/synapse-admin'
-
-  docker_container 'synapse_admin_webapp' do
+  docker_container new_resource.docker_container do
     repo 'awesometechnologies/synapse-admin'
     port ["#{new_resource.port}:80"]
-    volumes ['/opt/synapse_admin/config.json:/app/config.json:ro'] if new_resource.force_domain
+    volumes ["/opt/synapse_admin_#{new_resource.docker_container}/config.json:/app/config.json:ro"] if new_resource.home_server
   end
 end
