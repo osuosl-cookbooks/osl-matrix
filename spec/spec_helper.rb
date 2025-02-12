@@ -1,6 +1,15 @@
 require 'chefspec'
 require 'chefspec/berkshelf'
 
+ALMA_8 = {
+  platform: 'almalinux',
+  version: '8',
+}.freeze
+
+ALL_PLATFORMS = [
+  ALMA_8,
+].freeze
+
 RSpec.configure do |config|
   config.log_level = :warn
 end
@@ -10,7 +19,7 @@ RSpec.shared_context 'pwnam' do
   before do
     allow(Etc).to receive(:getpwnam).and_return(
       Etc::Passwd.new(
-        nil,
+        'synapse',
         nil,
         1001,
         nil,
