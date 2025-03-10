@@ -22,7 +22,11 @@ describe 'osl-matrix-test::element' do
         )
       end
 
-      it { is_expected.to pull_docker_image('vectorim/element-web') }
+      it {
+        is_expected.to pull_docker_image('vectorim/element-web').with(
+          tag: 'latest'
+        )
+      }
 
       it do
         is_expected.to run_docker_container('element_webapp').with(
