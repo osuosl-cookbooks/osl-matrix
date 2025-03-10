@@ -26,7 +26,7 @@ action :create do
 
   docker_image 'vectorim/element-web' do
     tag 'latest'
-    notifies :restart, 'docker_container[element_webapp]'
+    notifies :redeploy, 'docker_container[element_webapp]', :immediately
   end
 
   docker_container 'element_webapp' do
