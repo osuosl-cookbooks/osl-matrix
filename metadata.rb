@@ -9,6 +9,7 @@ chef_version      '>= 17.0'
 version           '1.4.1'
 
 supports          'almalinux', '~> 8.0'
+supports          'almalinux', '~> 9.0'
 
 depends           'osl-docker'
 depends           'osl-firewall'
