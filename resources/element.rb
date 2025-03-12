@@ -24,7 +24,10 @@ action :create do
     sensitive true
   end
 
-  docker_image 'vectorim/element-web'
+  docker_image 'vectorim/element-web' do
+    tag 'latest'
+    notifies :redeploy, 'docker_container[element_webapp]', :immediately
+  end
 
   docker_container 'element_webapp' do
     repo 'vectorim/element-web'
