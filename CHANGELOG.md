@@ -2,6 +2,10 @@
 
 This file is used to list changes made in each version of the osl-matrix cookbook.
 
+1.4.1 (2025-03-12)
+------------------
+- Pull and update element every time there's an update
+
 1.4.0 (2025-02-14)
 ------------------
 - Add Synapse Admin Webapp
