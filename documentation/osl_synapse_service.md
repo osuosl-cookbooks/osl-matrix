@@ -18,6 +18,8 @@ Any missing properties with the `pg_` prefix will result in the server setting u
 | -------------- | --------------------------------------------------------------------------- |
 | `heisenbridge` | An IRC bridge for Matrix [\[Github\]](https://github.com/hifi/heisenbridge) |
 | `hookshot`     | A webhook bot for recieving alerts [\[Github\]](https://github.com/matrix-org/matrix-hookshot) |
+| `matrix-appservice-irc` | A more feature rich IRC bridge for Matrix [\[Github\]](https://github.com/matrix-org/matrix-appservice-irc) |
+| `mjolnir`      | An auto-moderation bot for Matris [\[Github\]](https://github.com/matrix-org/mjolnir) |
 
 ## Properties
 
@@ -25,7 +27,8 @@ Any missing properties with the `pg_` prefix will result in the server setting u
 | ---------------- | ---------------- | ------------------------------------------------ | ----------- | -------- |
 | `appservices`    | Array            | `[]`                                             | An array of appservices which will be tied to this application. **Provide the resource name of the appservice**. | |
 | `config`         | Hash             | `{}`                                             | General Matrix Synapse settings to apply. Information of arguments can be found in the [Synapse Documentation](https://matrix-org.github.io/synapse/latest/usage/configuration/config_documentation.html) | |
-| `config_hookshot`| Hash    |                                               | General Matrix Hookshot settings to apply, mostly going to be used to set up specific services and configuration permissions. A lot of other required configurations have been automated. Information of arguments can be found in the [Hookshot Documentation](https://matrix-org.github.io/matrix-hookshot/latest/setup/sample-configuration.html) | |
+| `config_hookshot`| Hash             |                                                  | General Matrix Hookshot settings to apply, mostly going to be used to set up specific services and configuration permissions. A lot of other required configurations have been automated. Information of arguments can be found in the [Hookshot Documentation](https://matrix-org.github.io/matrix-hookshot/latest/setup/sample-configuration.html) | |
+| `config_mjolnir` | Hash             |                                                  | A grainular application to Mjolnir settings. A lot of other required configurations have been automated. Information of arguments can be found in the [Mjolnir Example](https://github.com/matrix-org/mjolnir/blob/main/src/appservice/config/config.example.yaml) | |
 | `domain`         | String           |                                                  | The FQDN of the matrix synapse site | Yes, resource name |
 | `pg_host`        | String           |                                                  | IP/Hostname of the Postgresql server | |
 | `pg_name`        | String           |                                                  | Database name | |
