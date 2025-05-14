@@ -2,7 +2,7 @@ include_recipe 'osl-docker'
 
 # Create the synapse docker container
 osl_synapse 'chat.example.org' do
-  appservices %w(osl-irc-bridge osl-hookshot-webhook osl-matrix-irc)
+  appservices %w(osl-irc-bridge osl-hookshot-webhook osl-matrix-irc osl-moderate)
   reg_key 'this-is-my-secret'
   pg_host 'postgres'
   pg_name 'synapse'
@@ -31,6 +31,11 @@ osl_synapse 'chat.example.org' do
   sensitive false
 end
 
+# Mjolnir moderation
+osl_mjolnir 'osl-moderate' do
+  host_domain 'chat.example.org'
+end
+
 # Matrix-Appservice-IRC App Service
 osl_matrix_irc 'osl-matrix-irc' do
   host_domain 'chat.example.org'
@@ -41,7 +46,6 @@ osl_matrix_irc 'osl-matrix-irc' do
       },
     },
   })
-  sensitive false
 end
 
 # Add on the Heisenbridge app service
@@ -71,7 +75,7 @@ osl_hookshot 'osl-hookshot-webhook' do
     },
   })
 end
-
+#
 # Additional servers for testing
 file '/opt/synapse-chat.example.org/compose/docker-addons.yaml' do
   content osl_yaml_dump({
@@ -97,5 +101,5 @@ end
 # Run the docker compose
 osl_dockercompose 'synapse' do
   directory '/opt/synapse-chat.example.org/compose'
-  config %w(docker-addons.yaml docker-synapse.yaml docker-osl-irc-bridge.yaml docker-osl-hookshot-webhook.yaml docker-osl-matrix-irc.yaml)
+  config %w(docker-addons.yaml docker-synapse.yaml docker-osl-irc-bridge.yaml docker-osl-hookshot-webhook.yaml docker-osl-matrix-irc.yaml docker-osl-moderate.yaml)
 end

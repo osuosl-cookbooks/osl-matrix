@@ -140,3 +140,37 @@ end
 describe file('/opt/synapse-chat.example.org/appservice-data/osl-matrix-irc-postgres/postgresql.conf') do
   it { should exist }
 end
+
+# Mjolnir Appservice
+
+# Hookshot Appservice Configuration
+describe file('/opt/synapse-chat.example.org/appservice/osl-moderate.yaml') do
+  it { should exist }
+  its('owner') { should eq 'synapse' }
+  its('content') { should match 'id: mjolnir' }
+  its('content') { should match 'url: http://osl-moderate:9899' }
+end
+
+describe file('/opt/synapse-chat.example.org/osl-moderate-config.yaml') do
+  it { should exist }
+  its('owner') { should eq 'synapse' }
+end
+
+# Postgres data directory
+describe file('/opt/synapse-chat.example.org/appservice-data/osl-moderate-db/postgresql.conf') do
+  it { should exist }
+end
+
+# Main Docker Container
+# Should not be running, as there is a default failing state.
+describe docker_container('synapse-osl-moderate-1') do
+  it { should exist }
+  its('image') { should eq 'matrixdotorg/mjolnir:latest' }
+end
+
+# Database Docker Container
+describe docker_container('synapse-osl-moderate-db-1') do
+  it { should exist }
+  it { should be_running }
+  its('image') { should eq 'postgres' }
+end

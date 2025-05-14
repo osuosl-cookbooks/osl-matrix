@@ -140,3 +140,37 @@ end
 describe file('/opt/synapse-chat.example.org/appservice-data/matrix-appservice-irc-postgres/postgresql.conf') do
   it { should exist }
 end
+
+# Mjolnir Appservice
+
+# Hookshot Appservice Configuration
+describe file('/opt/synapse-chat.example.org/appservice/mjolnir.yaml') do
+  it { should exist }
+  its('owner') { should eq 'synapse' }
+  its('content') { should match 'id: mjolnir' }
+  its('content') { should match 'url: http://mjolnir:9899' }
+end
+
+describe file('/opt/synapse-chat.example.org/mjolnir-config.yaml') do
+  it { should exist }
+  its('owner') { should eq 'synapse' }
+end
+
+# Postgres data directory
+describe file('/opt/synapse-chat.example.org/appservice-data/mjolnir-db/postgresql.conf') do
+  it { should exist }
+end
+
+# Main Docker Container
+# Should not be running, as there is a default failing state.
+describe docker_container('e5af17-mjolnir-1') do
+  it { should exist }
+  its('image') { should eq 'matrixdotorg/mjolnir:latest' }
+end
+
+# Database Docker Container
+describe docker_container('e5af17-mjolnir-db-1') do
+  it { should exist }
+  it { should be_running }
+  its('image') { should eq 'postgres' }
+end

@@ -8,6 +8,7 @@ property :appservices, Array, default: []
 property :config, Hash, default: {}
 property :config_hookshot, Hash, default: {}
 property :config_matrix_irc, Hash, default: {}
+property :config_mjolnir, Hash, default: {}
 property :domain, String, name_property: true
 property :irc_users_regex, String, default: '@as-irc_.*'
 property :key_github, String
@@ -22,6 +23,7 @@ property :tag, String, default: 'latest'
 property :tag_heisenbridge, String, default: 'latest'
 property :tag_hookshot, String, default: 'latest'
 property :tag_matrix_irc, String, default: 'latest'
+property :tag_mjolnir, String, default: 'latest'
 property :sensitive, [true, false], default: true
 
 action :create do
@@ -78,6 +80,15 @@ action :create do
     config new_resource.config_matrix_irc
     tag new_resource.tag_matrix_irc
     users_regex new_resource.irc_users_regex
+    only_if { new_resource.appservices.include?('matrix-appservice-irc') }
+    notifies :rebuild, "osl_dockercompose[#{compose_unique}]"
+    notifies :restart, "osl_dockercompose[#{compose_unique}]"
+  end
+
+  osl_mjolnir 'mjolnir' do
+    host_domain new_resource.domain
+    config new_resource.config_mjolnir
+    tag new_resource.tag_mjolnir
     only_if { new_resource.appservices.include?('matrix-appservice-irc') }
     notifies :rebuild, "osl_dockercompose[#{compose_unique}]"
     notifies :restart, "osl_dockercompose[#{compose_unique}]"

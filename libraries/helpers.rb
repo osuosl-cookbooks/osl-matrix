@@ -95,6 +95,27 @@ module OSLMatrix
         end
       end
 
+      # Generate the default configuraiton for Mjonir
+      def osl_mjolnir_defaults(custom_config)
+        {
+          'homeserver' => {
+            'domain' => "#{new_resource.host_domain}",
+            'url' => 'http://synapse:8008',
+          },
+          'db' => {
+            'engine' => 'postgres',
+            'connectionString' => "postgres://moderator:#{new_resource.key_homeserver}@#{new_resource.container_name}-db/moderator",
+          },
+          'webAPI' => {
+            'port' => new_resource.port_api,
+          },
+          'bot' => {
+            'displayName' => new_resource.bot_name,
+          },
+          'accessControlList' => new_resource.default_channel,
+        }.deep_merge(custom_config)
+      end
+
       # Generate the default configuration for matrix-appservice-irc
       def osl_matrix_irc_defaults(custom_config)
         default_config = {
