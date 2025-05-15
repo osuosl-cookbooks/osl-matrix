@@ -73,7 +73,7 @@ action :create do
           'POSTGRES_USER' => 'moderator',
         },
         'volumes' => [
-          "#{new_resource.host_path}/appservice-data/mjolnir.sql:/docker-entrypoint-initdb.d/init.sql:ro",
+          "#{new_resource.host_path}/appservice-data/mjolnir_init.sql:/docker-entrypoint-initdb.d/init.sql:ro",
           "#{new_resource.host_path}/appservice-data/#{new_resource.container_name}-db:/var/lib/postgresql/data",
         ],
       },
@@ -81,8 +81,9 @@ action :create do
   }
 
   # Generate the initSQL file
-  file "#{new_resource.host_path}/appservice-data/mjolnir.sql" do
-    content "\\c moderator\n CREATE TABLE mjolnir (local_part VARCHAR(255), owner VARCHAR(255), management_room TEXT);"
+  cookbook_file "#{new_resource.host_path}/appservice-data/mjolnir_init.sql" do
+    source 'mjolnir_init.sql'
+    cookbook 'osl-matrix'
   end
 
   # Generate the config file
