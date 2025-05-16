@@ -2,6 +2,10 @@
 
 This file is used to list changes made in each version of the osl-matrix cookbook.
 
+1.5.0 (2025-05-16)
+------------------
+- Add Mjolnir as an Appservice
+
 1.4.2 (2025-03-12)
 ------------------
 - Add AlmaLinux 9
