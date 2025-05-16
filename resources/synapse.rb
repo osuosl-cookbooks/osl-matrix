@@ -53,7 +53,7 @@ action :create do
   end
 
   # Keys, Compose, and appservice file directories
-  %w(keys compose appservice).each do |dir|
+  %w(keys compose appservice appservice-data).each do |dir|
     directory "#{new_resource.path}/#{dir}" do
       owner 'synapse'
       mode '700'

@@ -210,3 +210,45 @@ describe 'osl-matrix-test::synapse-no-quick' do
     end
   end
 end
+
+# osl_mjolnir
+describe 'osl-matrix-test::synapse-no-quick' do
+  ALL_PLATFORMS.each do |p|
+    context "#{p[:platform]} #{p[:version]}" do
+      cached(:chef_run) do
+        ChefSpec::SoloRunner.new(p.merge({ step_into: :osl_mjolnir })).converge(described_recipe)
+      end
+      include_context 'pwnam'
+
+      # Appservice file
+      it do
+        is_expected.to create_file('/opt/synapse-chat.example.org/appservice/osl-moderate.yaml').with(
+          owner: 'synapse',
+          group: 'synapse',
+          mode: '400',
+          sensitive: true
+        )
+      end
+
+      # Generate config file
+      it do
+        is_expected.to create_file('/opt/synapse-chat.example.org/osl-moderate-config.yaml').with(
+          owner: 'synapse',
+          group: 'synapse',
+          mode: '400',
+          sensitive: true
+        )
+      end
+
+      # Create Hookshot compose file
+      it do
+        is_expected.to create_file('/opt/synapse-chat.example.org/compose/docker-osl-moderate.yaml').with(
+          owner: 'synapse',
+          group: 'synapse',
+          mode: '400',
+          sensitive: true
+        )
+      end
+    end
+  end
+end
