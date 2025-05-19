@@ -23,13 +23,21 @@
         "https://scalar-staging.riot.im/scalar/api"
     ],
     "default_country_code": "US",
-    "show_labs_settings": false,
+    "show_labs_settings": true,
     "features": {},
     "default_federate": true,
     "default_theme": "dark",
     "room_directory": {
       "servers": ["<%= @fqdn %>"]
     },
+    <% if @branding -%>
+    "branding": {
+      "welcome_background_url": "/assets/background.jpg",
+      "auth_header_logo_url": "/assets/logo.svg",
+      "auth_footer_links": [
+      ]
+    },
+    <% end -%>
     "enable_presence_by_hs_url": {
         "https://matrix.org": false,
         "https://matrix-client.matrix.org": false
