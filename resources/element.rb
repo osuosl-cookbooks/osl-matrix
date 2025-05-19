@@ -23,7 +23,7 @@ action :create do
 
   # Custom branding
   enable_branding = new_resource.background || new_resource.logo
-  
+
   cookbook_file "/opt/element/background#{::File.extname(new_resource.background)}" do
     source new_resource.background
     only_if { new_resource.background }
