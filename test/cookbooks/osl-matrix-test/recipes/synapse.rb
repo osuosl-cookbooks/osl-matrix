@@ -2,6 +2,7 @@
 osl_synapse_service 'chat.example.org' do
   appservices %w(hookshot heisenbridge matrix-appservice-irc mjolnir)
   reg_key 'this-is-my-secret'
+  mjolnir_token 'TODO'
   config(
     {
       'modules' => [

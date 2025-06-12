@@ -34,6 +34,7 @@ end
 # Mjolnir moderation
 osl_mjolnir 'osl-moderate' do
   host_domain 'chat.example.org'
+  access_token 'TODO'
 end
 
 # Matrix-Appservice-IRC App Service

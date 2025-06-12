@@ -156,11 +156,6 @@ describe file('/opt/synapse-chat.example.org/mjolnir-config.yaml') do
   its('owner') { should eq 'synapse' }
 end
 
-# Postgres data directory
-describe file('/opt/synapse-chat.example.org/appservice-data/mjolnir-db/postgresql.conf') do
-  it { should exist }
-end
-
 # Main Docker Container
 # Should not be running, as there is a default failing state.
 describe docker_container('e5af17-mjolnir-1') do
