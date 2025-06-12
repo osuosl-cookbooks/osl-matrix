@@ -9,6 +9,7 @@ property :config, Hash, default: {}
 property :config_hookshot, Hash, default: {}
 property :config_matrix_irc, Hash, default: {}
 property :config_mjolnir, Hash, default: {}
+property :mjolnir_token, String
 property :domain, String, name_property: true
 property :irc_users_regex, String, default: '@as-irc_.*'
 property :key_github, String
@@ -89,6 +90,7 @@ action :create do
     host_domain new_resource.domain
     config new_resource.config_mjolnir
     tag new_resource.tag_mjolnir
+    access_token new_resource.mjolnir_token
     only_if { new_resource.appservices.include?('mjolnir') }
     notifies :rebuild, "osl_dockercompose[#{compose_unique}]"
     notifies :restart, "osl_dockercompose[#{compose_unique}]"
