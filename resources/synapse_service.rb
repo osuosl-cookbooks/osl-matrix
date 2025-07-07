@@ -9,7 +9,7 @@ property :config, Hash, default: {}
 property :config_hookshot, Hash, default: {}
 property :config_matrix_irc, Hash, default: {}
 property :config_mjolnir, Hash, default: {}
-property :mjolnir_token, String
+property :mjolnir_token, String, sensitive: true
 property :domain, String, name_property: true
 property :irc_users_regex, String, default: '@as-irc_.*'
 property :key_github, String
@@ -86,6 +86,21 @@ action :create do
     notifies :restart, "osl_dockercompose[#{compose_unique}]"
   end
 
+  # TODO @ramereth Keep this as a 2 minute sleep, or poll for localhost:8008
+  chef_sleep 'register mjolnir' do
+    seconds 120
+    action :nothing
+    notifies :register, 'osl_matrix_user[mjolnir]'
+  end
+
+  osl_matrix_user 'mjolnir' do
+    password SecureRandom.hex(16)
+    admin true
+    domain new_resource.domain
+    homeserver_url "http://localhost:#{new_resource.port}"
+    action :nothing
+  end
+
   osl_mjolnir 'mjolnir' do
     host_domain new_resource.domain
     config new_resource.config_mjolnir
@@ -94,6 +109,7 @@ action :create do
     only_if { new_resource.appservices.include?('mjolnir') }
     notifies :rebuild, "osl_dockercompose[#{compose_unique}]"
     notifies :restart, "osl_dockercompose[#{compose_unique}]"
+    notifies :sleep, 'chef_sleep[register mjolnir]'
   end
 
   directory "#{synapse_path}/bin"
