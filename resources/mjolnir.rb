@@ -18,7 +18,7 @@ property :host_name, String, default: lazy { "synapse-#{host_domain}" }
 property :host_path, String, default: lazy { "/opt/#{host_name}" }
 property :key_appservice, String, default: lazy { osl_matrix_genkey(host_name + container_name) }
 property :key_homeserver, String, default: lazy { osl_matrix_genkey(container_name + host_name) }
-property :access_token, String, required: true
+property :access_token, String, required: true, sensitive: true
 property :nsfw_sensitivity, Float, default: 0.6
 property :default_channel, String, default: lazy { "#mjolnir:#{host_domain}" }
 property :tag, String, default: 'latest'
