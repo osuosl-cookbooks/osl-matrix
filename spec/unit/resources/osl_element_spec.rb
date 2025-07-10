@@ -15,18 +15,19 @@ describe 'osl-matrix-test::element' do
       end
 
       it { is_expected.to create_directory('/opt/element') }
+      it { is_expected.to create_template('/opt/element/config.json').with(source: 'element-config.json.erb') }
 
       it do
-        is_expected.to create_template('/opt/element/config.json').with(
-          source: 'element-config.json.erb'
-        )
+        expect(chef_run.template('/opt/element/config.json')).to \
+          notify('docker_container[element_webapp]').to(:redeploy)
       end
 
-      it {
-        is_expected.to pull_docker_image('vectorim/element-web').with(
-          tag: 'latest'
-        )
-      }
+      it { is_expected.to pull_docker_image('vectorim/element-web').with(tag: 'latest') }
+
+      it do
+        expect(chef_run.docker_image('vectorim/element-web')).to \
+          notify('docker_container[element_webapp]').to(:redeploy).immediately
+      end
 
       it do
         is_expected.to run_docker_container('element_webapp').with(

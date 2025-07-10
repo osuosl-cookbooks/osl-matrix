@@ -22,6 +22,7 @@ action :create do
   file "/opt/synapse_admin_#{new_resource.container_name}/config.json" do
     content JSON.dump({ 'restrictBaseUrl' => new_resource.home_server })
     not_if { new_resource.home_server.empty? }
+    notifies :redeploy, "docker_container[#{new_resource.container_name}]"
   end
 
   docker_image 'awesometechnologies/synapse-admin' do

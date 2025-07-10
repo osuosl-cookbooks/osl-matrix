@@ -22,6 +22,7 @@ action :create do
     cookbook 'osl-matrix'
     variables(fqdn: new_resource.matrix_domain)
     sensitive true
+    notifies :redeploy, 'docker_container[element_webapp]'
   end
 
   docker_image 'vectorim/element-web' do
