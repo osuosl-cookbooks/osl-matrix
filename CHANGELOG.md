@@ -2,6 +2,10 @@
 
 This file is used to list changes made in each version of the osl-matrix cookbook.
 
+1.5.1 (2025-07-10)
+------------------
+- Add missing notifies when config changes
+
 1.5.0 (2025-05-16)
 ------------------
 - Add Mjolnir as an Appservice
