@@ -23,7 +23,17 @@ describe 'osl-matrix-test::synapse-admin' do
         )
       end
 
+      it do
+        expect(chef_run.file('/opt/synapse_admin_test_admin/config.json')).to \
+          notify('docker_container[test_admin]').to(:redeploy)
+      end
+
       it { is_expected.to pull_docker_image('awesometechnologies/synapse-admin') }
+
+      it do
+        expect(chef_run.docker_image('awesometechnologies/synapse-admin')).to \
+          notify('docker_container[test_admin]').to(:redeploy)
+      end
 
       it do
         is_expected.to run_docker_container('test_admin').with(
@@ -41,7 +51,17 @@ describe 'osl-matrix-test::synapse-admin' do
         )
       end
 
+      it do
+        expect(chef_run.file('/opt/synapse_admin_test_multiple_servers/config.json')).to \
+          notify('docker_container[test_multiple_servers]').to(:redeploy)
+      end
+
       it { is_expected.to pull_docker_image('awesometechnologies/synapse-admin') }
+
+      it do
+        expect(chef_run.docker_image('awesometechnologies/synapse-admin')).to \
+          notify('docker_container[test_multiple_servers]').to(:redeploy)
+      end
 
       it do
         is_expected.to run_docker_container('test_multiple_servers').with(
