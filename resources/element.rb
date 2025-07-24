@@ -26,15 +26,13 @@ action :create do
 
   cookbook_file "/opt/element/background#{::File.extname(new_resource.background)}" do
     source new_resource.background
-    only_if { new_resource.background }
-  end
+  end if new_resource.background
 
   volumes.push("/opt/element/background#{::File.extname(new_resource.background)}:/app/assets/background#{::File.extname(new_resource.background)}:ro") if new_resource.background
 
   cookbook_file "/opt/element/logo#{::File.extname(new_resource.logo)}" do
     source new_resource.logo
-    only_if { new_resource.logo }
-  end
+  end if new_resource.logo
 
   volumes.push("/opt/element/logo#{::File.extname(new_resource.logo)}:/app/assets/logo#{::File.extname(new_resource.logo)}:ro") if new_resource.logo
 
