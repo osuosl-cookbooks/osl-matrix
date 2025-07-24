@@ -31,9 +31,16 @@ describe http('127.0.0.1:8000', headers: { 'Host': 'chat.example.org' }) do
 end
 
 # Branding
-
 %w(background.jpg logo.svg).each do |f|
   describe http("127.0.0.1:8000/assets/#{f}", headers: { 'Host': 'chat.example.org' }) do
     its('status') { should eq 200 }
   end
+end
+
+describe file '/opt/element/background.jpg' do
+  its('sha256sum') { should cmp '3674f05346d02ec24f0eddc3dbfe296b5bbcbd498ec6ac5febd78e6dfdbf12fa' }
+end
+
+describe file '/opt/element/logo.svg' do
+  its('sha256sum') { should cmp 'b4f02576e13dc90bc399831843d9a38dab171773f32f1be6919a70d712f91eae' }
 end
