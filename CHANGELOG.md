@@ -2,6 +2,10 @@
 
 This file is used to list changes made in each version of the osl-matrix cookbook.
 
+1.6.1 (2025-07-24)
+------------------
+- Fix branding code if branding isn't used
+
 1.6.0 (2025-07-24)
 ------------------
 - Added branding support to Element
