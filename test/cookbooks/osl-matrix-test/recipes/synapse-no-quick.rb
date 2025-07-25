@@ -34,6 +34,7 @@ end
 # Mjolnir moderation
 osl_mjolnir 'osl-moderate' do
   host_domain 'chat.example.org'
+  access_token 'TODO'
 end
 
 # Matrix-Appservice-IRC App Service
@@ -102,4 +103,16 @@ end
 osl_dockercompose 'synapse' do
   directory '/opt/synapse-chat.example.org/compose'
   config %w(docker-addons.yaml docker-synapse.yaml docker-osl-irc-bridge.yaml docker-osl-hookshot-webhook.yaml docker-osl-matrix-irc.yaml docker-osl-moderate.yaml)
+end
+
+# Hardcoded waiting @ramereth, continue with either a 2 minute sleep, or check localhost:8008 for a response
+chef_sleep 'Hardcoded waiting for Synapse to start' do
+  seconds 120
+end
+
+# Add user
+osl_matrix_user 'admin' do
+  password 'password'
+  admin true
+  domain 'chat.example.org'
 end
