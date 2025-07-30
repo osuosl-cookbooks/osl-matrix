@@ -36,7 +36,7 @@ action :create do
   # Run the docker compose, but only do so after the converge finishes everything else
   osl_dockercompose compose_unique do
     directory "#{synapse_path}/compose"
-    config compose_files
+    config_files compose_files
     action :nothing
   end
 

@@ -101,5 +101,5 @@ end
 # Run the docker compose
 osl_dockercompose 'synapse' do
   directory '/opt/synapse-chat.example.org/compose'
-  config %w(docker-addons.yaml docker-synapse.yaml docker-osl-irc-bridge.yaml docker-osl-hookshot-webhook.yaml docker-osl-matrix-irc.yaml docker-osl-moderate.yaml)
+  config_files %w(docker-addons.yaml docker-synapse.yaml docker-osl-irc-bridge.yaml docker-osl-hookshot-webhook.yaml docker-osl-matrix-irc.yaml docker-osl-moderate.yaml)
 end

@@ -11,7 +11,7 @@ version           '1.6.1'
 supports          'almalinux', '~> 8.0'
 supports          'almalinux', '~> 9.0'
 
-depends           'osl-docker'
+depends           'osl-docker', '>= 4.16.0'
 depends           'osl-firewall'
 depends           'osl-nginx'
 depends           'osl-postgresql'
