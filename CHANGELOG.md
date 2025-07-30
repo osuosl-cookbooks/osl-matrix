@@ -2,6 +2,10 @@
 
 This file is used to list changes made in each version of the osl-matrix cookbook.
 
+1.6.2 (2025-07-30)
+------------------
+- Update osl_dockercompose resource to use renamed property
+
 1.6.1 (2025-07-24)
 ------------------
 - Fix branding code if branding isn't used
