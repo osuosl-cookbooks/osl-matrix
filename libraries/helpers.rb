@@ -98,21 +98,24 @@ module OSLMatrix
       # Generate the default configuraiton for Mjonir
       def osl_mjolnir_defaults(custom_config)
         {
-          'homeserver' => {
-            'domain' => "#{new_resource.host_domain}",
-            'url' => 'http://synapse:8008',
-          },
-          'db' => {
-            'engine' => 'postgres',
-            'connectionString' => "postgres://moderator:#{new_resource.key_homeserver}@#{new_resource.container_name}-db/moderator",
-          },
-          'webAPI' => {
+          'homeserverUrl' => 'http://synapse:8008',
+          'rawHomeserverUrl' => 'http://synapse:8008',
+          'accessToken' => new_resource.access_token,
+          'dataPath' => '/data/storage',
+          'autojoinOnlyIfManager' => true,
+          'managementRoom' => new_resource.default_channel,
+          'synOnStartup' => true,
+          'verifyPermissionOnStartup' => true,
+          'displayReports' => true,
+          'nsfwSensitivity' => new_resource.nsfw_sensitivity,
+          'web' => {
+            'enabled' => true,
             'port' => new_resource.port_api,
+            'address' => '0.0.0.0',
+            'abuseReporting' => {
+              'enabled' => true,
+            },
           },
-          'bot' => {
-            'displayName' => new_resource.bot_name,
-          },
-          'accessControlList' => new_resource.default_channel,
         }.deep_merge(custom_config)
       end
 
