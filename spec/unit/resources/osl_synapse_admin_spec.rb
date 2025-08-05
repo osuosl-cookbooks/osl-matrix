@@ -14,6 +14,8 @@ describe 'osl-matrix-test::synapse-admin' do
         ChefSpec::SoloRunner.new(p.merge({ step_into: :osl_synapse_admin })).converge(described_recipe)
       end
 
+      include_context 'common'
+
       # Single server
       it { is_expected.to create_directory('/opt/synapse_admin_test_admin') }
 

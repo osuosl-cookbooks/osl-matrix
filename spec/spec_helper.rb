@@ -35,3 +35,9 @@ RSpec.shared_context 'pwnam' do
     )
   end
 end
+
+shared_context 'common' do
+  before do
+    stub_command('iptables -C INPUT -j REJECT --reject-with icmp-host-prohibited 2>/dev/null').and_return(true)
+  end
+end
