@@ -15,6 +15,7 @@ describe 'osl-matrix-test::synapse-no-quick' do
         ChefSpec::SoloRunner.new(p.merge({ step_into: :osl_synapse })).converge(described_recipe)
       end
       include_context 'pwnam'
+      include_context 'common'
 
       # Create the user who will be managing the synapse instances
       it { is_expected.to create_user('synapse').with(system: true) }
@@ -78,6 +79,7 @@ describe 'osl-matrix-test::synapse-no-quick' do
         ChefSpec::SoloRunner.new(p.merge({ step_into: :osl_heisenbridge })).converge(described_recipe)
       end
       include_context 'pwnam'
+      include_context 'common'
 
       # Appservice file
       it do
@@ -110,6 +112,7 @@ describe 'osl-matrix-test::synapse-no-quick' do
         ChefSpec::SoloRunner.new(p.merge({ step_into: :osl_hookshot })).converge(described_recipe)
       end
       include_context 'pwnam'
+      include_context 'common'
 
       # Appservice file
       it do
@@ -161,6 +164,7 @@ describe 'osl-matrix-test::synapse-no-quick' do
         ChefSpec::SoloRunner.new(p.merge({ step_into: :osl_matrix_irc })).converge(described_recipe)
       end
       include_context 'pwnam'
+      include_context 'common'
 
       # Appservice file
       it do
@@ -219,6 +223,7 @@ describe 'osl-matrix-test::synapse-no-quick' do
         ChefSpec::SoloRunner.new(p.merge({ step_into: :osl_mjolnir })).converge(described_recipe)
       end
       include_context 'pwnam'
+      include_context 'common'
 
       # Appservice file
       it do

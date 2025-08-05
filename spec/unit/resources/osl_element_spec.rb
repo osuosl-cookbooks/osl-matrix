@@ -14,6 +14,8 @@ describe 'osl-matrix-test::element' do
         ChefSpec::SoloRunner.new(p.merge({ step_into: :osl_element })).converge(described_recipe)
       end
 
+      include_context 'common'
+
       it { is_expected.to create_directory('/opt/element') }
       it { is_expected.to create_template('/opt/element/config.json').with(source: 'element-config.json.erb') }
 
