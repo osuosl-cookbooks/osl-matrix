@@ -1,0 +1,14 @@
+{
+  "id": "access",
+  "resources": [
+    {
+      "attributes": {
+        "type": "host",
+        "database": "synapse",
+        "user": "synapse",
+        "address": "all",
+        "auth_method": "scram-sha-256"
+      }
+    }
+  ]
+}

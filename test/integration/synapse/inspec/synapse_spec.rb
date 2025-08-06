@@ -37,12 +37,13 @@ describe file('/opt/synapse-chat.example.org/homeserver.yaml') do
 end
 
 # Docker Container
-describe docker_container('e5af17-synapse-1') do
+describe docker_container('chat_example_org-synapse-1') do
   it { should exist }
   it { should be_running }
   its('image') { should eq 'matrixdotorg/synapse:latest' }
   its('ports') { should match '8008->8008/tcp' }
   its('ports') { should match '8448/tcp' }
+  its('status') { should match /Up.*healthy/ }
 end
 
 # Check to see if we can send HTTP requests
@@ -61,10 +62,11 @@ describe file('/opt/synapse-chat.example.org/appservice/heisenbridge.yaml') do
 end
 
 # Docker Container
-describe docker_container('e5af17-heisenbridge-1') do
+describe docker_container('synapse_service_chat_example_org-heisenbridge-1') do
   it { should exist }
   it { should be_running }
   its('image') { should eq 'hif1/heisenbridge:latest' }
+  its('status') { should match /Up/ }
 end
 
 # Hookshot Appservice
@@ -91,11 +93,12 @@ describe file('/opt/synapse-chat.example.org/keys/hookshot.pem') do
 end
 
 # Docker Container
-describe docker_container('e5af17-hookshot-1') do
+describe docker_container('synapse_service_chat_example_org-hookshot-1') do
   it { should exist }
   it { should be_running }
   its('image') { should eq 'halfshot/matrix-hookshot:latest' }
   its('ports') { should match '9000-9002->9000-9002/tcp' }
+  its('status') { should match /Up.*/ }
 end
 
 # Matrix-Appservice-IRC Appservice
@@ -109,10 +112,11 @@ describe file('/opt/synapse-chat.example.org/appservice/matrix-appservice-irc.ya
 end
 
 # Docker Container
-describe docker_container('e5af17-matrix-appservice-irc-1') do
+describe docker_container('synapse_service_chat_example_org-matrix-appservice-irc-1') do
   it { should exist }
   it { should be_running }
   its('image') { should eq 'matrixdotorg/matrix-appservice-irc:latest' }
+  its('status') { should match /Up.*/ }
 end
 
 # Config File
@@ -158,9 +162,10 @@ end
 
 # Main Docker Container
 # Should not be running, as there is a default failing state.
-describe docker_container('e5af17-mjolnir-1') do
+describe docker_container('synapse_service_chat_example_org-mjolnir-1') do
   it { should exist }
   its('image') { should eq 'matrixdotorg/mjolnir:latest' }
+  its('status') { should match /Up.*/ }
 end
 
 # Database Docker Container

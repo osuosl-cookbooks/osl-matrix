@@ -16,8 +16,19 @@ describe 'osl-matrix-test::element' do
 
       include_context 'common'
 
+      it { is_expected.to include_recipe 'osl-docker' }
       it { is_expected.to create_directory('/opt/element') }
-      it { is_expected.to create_template('/opt/element/config.json').with(source: 'element-config.json.erb') }
+
+      it do
+        is_expected.to create_template('/opt/element/config.json').with(
+          source: 'element-config.json.erb',
+          cookbook: 'osl-matrix',
+          variables: {
+            fqdn: 'chat.example.org',
+            branding: 'inkscape-bg.jpg',
+          }
+        )
+      end
 
       it do
         expect(chef_run.template('/opt/element/config.json')).to \
@@ -34,7 +45,8 @@ describe 'osl-matrix-test::element' do
       it do
         is_expected.to run_docker_container('element_webapp').with(
           repo: 'vectorim/element-web',
-          port: ['8000:80']
+          port: ['8000:80'],
+          volumes: {}
         )
       end
     end

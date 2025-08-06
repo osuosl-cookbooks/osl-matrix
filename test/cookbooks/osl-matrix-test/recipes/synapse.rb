@@ -1,8 +1,15 @@
+append_if_no_line node['ipaddress'] do
+  path '/etc/hosts'
+  line "#{node['ipaddress']} chat.example.org"
+  sensitive false
+end
+
 # Create a quick synapse server
 osl_synapse_service 'chat.example.org' do
+  admin_password 'admin'
   appservices %w(hookshot heisenbridge matrix-appservice-irc mjolnir)
   reg_key 'this-is-my-secret'
-  mjolnir_token 'TODO'
+  mjolnir_password 'mjolnir'
   config(
     {
       'modules' => [
@@ -39,4 +46,9 @@ osl_synapse_service 'chat.example.org' do
       },
     },
   })
+end
+
+osl_matrix_user 'test' do
+  password 'test'
+  homeserver_url 'http://chat.example.org:8008'
 end
