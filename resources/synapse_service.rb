@@ -93,4 +93,17 @@ action :create do
     notifies :rebuild, "osl_dockercompose[#{compose_unique}]"
     notifies :restart, "osl_dockercompose[#{compose_unique}]"
   end
+
+  directory "#{synapse_path}/bin"
+
+  template "#{synapse_path}/bin/docker_compose" do
+    source 'docker_compose.erb'
+    cookbook 'osl-matrix'
+    mode '0755'
+    variables(
+      directory: "#{synapse_path}/compose",
+      project: compose_unique,
+      config_files: compose_files
+    )
+  end
 end
