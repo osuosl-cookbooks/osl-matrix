@@ -2,6 +2,10 @@
 
 This file is used to list changes made in each version of the osl-matrix cookbook.
 
+1.6.3 (2025-08-07)
+------------------
+- Add docker compose helper script
+
 1.6.2 (2025-07-30)
 ------------------
 - Update osl_dockercompose resource to use renamed property
