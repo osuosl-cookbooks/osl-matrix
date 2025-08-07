@@ -17,7 +17,6 @@ property :port, Integer, default: 8008
 property :fed_port, Integer, default: 8448
 property :reg_key, String, default: lazy { osl_matrix_genkey(path + container_name) }
 property :tag, String, default: 'latest'
-property :sensitive, [true, false], default: true
 
 action :create do
   include_recipe 'osl-docker'
@@ -37,9 +36,10 @@ action :create do
         username: new_resource.pg_username,
         password: new_resource.pg_password,
       },
-      new_resource.appservices
+      appservices
     )
   ) { |_key, config_value, default_value| config_value || default_value }
+  compose_name = new_resource.name.gsub('.', '_')
 
   # Initalize the matrix manager
   user 'synapse' do
@@ -76,6 +76,7 @@ action :create do
     group 'synapse'
     mode '400'
     sensitive true
+    notifies :rebuild, "osl_dockercompose[#{compose_name}]"
   end
 
   config_compose = {
@@ -88,7 +89,14 @@ action :create do
         ],
         'user' => osl_synapse_user,
         'restart' => 'always',
-        'depends_on' => new_resource.appservices,
+        'networks' => [
+          compose_name,
+        ],
+      },
+    },
+    'networks' => {
+      compose_name => {
+        'external' => true,
       },
     },
   }
@@ -100,5 +108,23 @@ action :create do
     group 'synapse'
     mode '400'
     sensitive true
+    notifies :rebuild, "osl_dockercompose[#{compose_name}]"
+  end
+
+  docker_network compose_name
+
+  osl_dockercompose compose_name do
+    directory "/opt/synapse-#{new_resource.domain}/compose"
+    config_files %w(docker-synapse.yaml)
+  end
+end
+
+action :restart do
+  compose_name = new_resource.name.gsub('.', '_')
+
+  osl_dockercompose compose_name do
+    directory "/opt/synapse-#{new_resource.domain}/compose"
+    config_files %w(docker-synapse.yaml)
+    action :restart
   end
 end
