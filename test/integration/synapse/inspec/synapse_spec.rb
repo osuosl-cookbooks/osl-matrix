@@ -174,3 +174,15 @@ describe docker_container('e5af17-mjolnir-db-1') do
   it { should be_running }
   its('image') { should eq 'postgres' }
 end
+
+describe command '/opt/synapse-chat.example.org/bin/docker_compose ps' do
+  %w(
+    heisenbridge
+    hookshot
+    matrix-appservice-irc
+    mjolnir
+    synapse
+  ).each do |s|
+    its('stdout') { should match s }
+  end
+end

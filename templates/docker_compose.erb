@@ -1,0 +1,3 @@
+#!/bin/bash
+cd <%= @directory %>
+docker compose -p <%= @project %> -f <%= @config_files.join(' -f ') %> $@
