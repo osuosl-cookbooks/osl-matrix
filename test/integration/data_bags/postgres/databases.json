@@ -1,0 +1,15 @@
+{
+  "id": "databases",
+  "resources": [
+    {
+      "name": "synapse",
+      "resource": "postgresql_database",
+      "attributes": {
+        "owner": "synapse",
+        "template": "template0",
+        "lc_collate": "C",
+        "lc_ctype": "C"
+      }
+    }
+  ]
+}

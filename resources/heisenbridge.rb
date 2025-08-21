@@ -19,6 +19,8 @@ property :tag, String, default: 'latest'
 property :sensitive, [true, false], default: true
 
 action :create do
+  compose_name = new_resource.host_domain.gsub('.', '_')
+
   # Pull down the latest version
   docker_image 'hif1/heisenbridge' do
     tag new_resource.tag
@@ -52,6 +54,14 @@ action :create do
         ],
         'user' => osl_synapse_user,
         'restart' => 'always',
+        'networks' => [
+          compose_name,
+        ],
+      },
+    },
+    'networks' => {
+      compose_name => {
+        'external' => true,
       },
     },
   }

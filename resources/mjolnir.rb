@@ -11,26 +11,29 @@ default_action :create
 
 property :config, Hash, default: {}
 property :container_name, String, name_property: true
-property :port, Integer, default: 9899
-property :port_api, Integer, default: 9003
+property :default_channel, String, default: '#mjolnir', coerce: proc { |c| "#{c}:#{host_domain}" }
 property :host_domain, String, required: true
 property :host_name, String, default: lazy { "synapse-#{host_domain}" }
 property :host_path, String, default: lazy { "/opt/#{host_name}" }
 property :key_appservice, String, default: lazy { osl_matrix_genkey(host_name + container_name) }
 property :key_homeserver, String, default: lazy { osl_matrix_genkey(container_name + host_name) }
-property :bot_name, String, default: 'Auto Mod'
-property :default_channel, String, default: lazy { "#mjolnir:#{host_domain}" }
+property :nsfw_sensitivity, Float, default: 0.6
+property :port_api, Integer, default: 9003
+property :port, Integer, default: 9899
 property :tag, String, default: 'latest'
-property :sensitive, [true, false], default: true
 
 action :create do
+  compose_name = new_resource.host_domain.gsub('.', '_')
+
   # Pull down the latest version
   docker_image 'matrixdotorg/mjolnir' do
     tag new_resource.tag
   end
 
+  access_token = ::File.read("/opt/synapse-#{new_resource.host_domain}/keys/mjolnir-access_token.key")
+
   # Get the config from the new resource, and put into a mutable variable
-  config = osl_mjolnir_defaults(new_resource.config)
+  config = osl_mjolnir_defaults(new_resource.config, access_token)
 
   # Generate the app service file
   osl_synapse_appservice(
@@ -38,53 +41,36 @@ action :create do
     "http://#{new_resource.container_name}:#{new_resource.port}",
     new_resource.key_appservice,
     new_resource.key_homeserver,
-    'mjolnir',
-    {
-      'users' => [
-        {
-          'exclusive' => true,
-          'regex' => '@mjolnir_.*',
-        },
-      ],
-    }
+    'mjolnir-as',
+    {}
   )
 
   # Generate the compose config
   config_compose = {
     'services' => {
       new_resource.container_name => {
-        'command' => "appservice -c /data/config.yaml -f /data/appservice.yaml -p #{new_resource.port}",
+        'command' => 'bot --mjolnir-config /data/config.yaml',
         'image' => "matrixdotorg/mjolnir:#{new_resource.tag}",
         'volumes' => [
           "#{new_resource.host_path}/appservice/#{new_resource.container_name}.yaml:/data/appservice.yaml:ro",
           "#{new_resource.host_path}/#{new_resource.container_name}-config.yaml:/data/config.yaml:ro",
-          "#{new_resource.host_path}/appservice-data/#{new_resource.container_name}:/data/persistent",
+          "#{new_resource.host_path}/appservice-data/#{new_resource.container_name}:/data",
         ],
         'ports' => [
           "#{new_resource.port_api}:#{new_resource.port_api}",
         ],
         'restart' => 'always',
-        'depends_on' => ["#{new_resource.container_name}-db"],
-      },
-      "#{new_resource.container_name}-db" => {
-        'image' => 'postgres',
-        'environment' => {
-          'POSTGRES_PASSWORD' => new_resource.key_homeserver,
-          'POSTGRES_USER' => 'moderator',
-        },
-        'volumes' => [
-          "#{new_resource.host_path}/appservice-data/mjolnir_init.sql:/docker-entrypoint-initdb.d/init.sql:ro",
-          "#{new_resource.host_path}/appservice-data/#{new_resource.container_name}-db:/var/lib/postgresql/data",
+        'networks' => [
+          compose_name,
         ],
       },
     },
+    'networks' => {
+      compose_name => {
+        'external' => true,
+      },
+    },
   }
-
-  # Generate the initSQL file
-  cookbook_file "#{new_resource.host_path}/appservice-data/mjolnir_init.sql" do
-    source 'mjolnir_init.sql'
-    cookbook 'osl-matrix'
-  end
 
   # Generate the config file
   file "#{new_resource.host_path}/#{new_resource.container_name}-config.yaml" do

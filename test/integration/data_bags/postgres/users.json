@@ -1,0 +1,14 @@
+{
+  "id": "users",
+  "resources": [
+    {
+      "name": "synapse",
+      "resource": "postgresql_role",
+      "attributes": {
+        "unencrypted_password": "password",
+        "createdb": true,
+        "login": true
+      }
+    }
+  ]
+}

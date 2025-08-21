@@ -16,6 +16,8 @@ describe 'osl-matrix-test::synapse-admin' do
 
       include_context 'common'
 
+      it { is_expected.to include_recipe 'osl-docker' }
+
       # Single server
       it { is_expected.to create_directory('/opt/synapse_admin_test_admin') }
 
@@ -40,7 +42,8 @@ describe 'osl-matrix-test::synapse-admin' do
       it do
         is_expected.to run_docker_container('test_admin').with(
           repo: 'awesometechnologies/synapse-admin',
-          port: ['8080:80']
+          port: ['8080:80'],
+          volumes: {}
         )
       end
 
@@ -68,7 +71,8 @@ describe 'osl-matrix-test::synapse-admin' do
       it do
         is_expected.to run_docker_container('test_multiple_servers').with(
           repo: 'awesometechnologies/synapse-admin',
-          port: ['8081:80']
+          port: ['8081:80'],
+          volumes: {}
         )
       end
     end

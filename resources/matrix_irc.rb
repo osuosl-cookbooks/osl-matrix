@@ -21,6 +21,8 @@ property :sensitive, [true, false], default: true
 property :users_regex, String, default: '@as-irc_.*'
 
 action :create do
+  compose_name = new_resource.host_domain.gsub('.', '_')
+
   # Pull down the latest version
   docker_image 'matrixdotorg/matrix-appservice-irc' do
     tag new_resource.tag
@@ -61,6 +63,7 @@ action :create do
     command "openssl genpkey -out \"#{new_resource.host_path}/keys/irc-passkey.pem\" -outform PEM -algorithm RSA -pkeyopt rsa_keygen_bits:2048; chmod 400 '#{new_resource.host_path}/keys/irc-passkey.pem'"
     user 'synapse'
     group 'synapse'
+    sensitive true
     creates "#{new_resource.host_path}/keys/irc-passkey.pem"
   end
 
@@ -79,6 +82,7 @@ action :create do
   #  end
   execute 'Generate signingkey' do
     command "docker run --rm --entrypoint \"sh\" --volume #{new_resource.host_path}/keys:/data --user #{osl_synapse_user} matrixdotorg/matrix-appservice-irc \"-c\" \"node lib/generate-signing-key.js > /data/signingkey.jwk && chmod 400 /data/signingkey.jwk\""
+    sensitive true
     creates "#{new_resource.host_path}/keys/signingkey.jwk"
   end
 
@@ -95,6 +99,9 @@ action :create do
           'POSTGRES_PASSWORD' => osl_matrix_genkey(new_resource.container_name),
         },
         'restart' => 'always',
+        'networks' => [
+          compose_name,
+        ],
       },
       new_resource.container_name => {
         'image' => "matrixdotorg/matrix-appservice-irc:#{new_resource.tag}",
@@ -107,6 +114,14 @@ action :create do
         'user' => osl_synapse_user,
         'restart' => 'always',
         'depends_on' => ["#{new_resource.container_name}-postgres"],
+        'networks' => [
+          compose_name,
+        ],
+      },
+    },
+    'networks' => {
+      compose_name => {
+        'external' => true,
       },
     },
   }

@@ -25,6 +25,8 @@ property :tag, String, default: 'latest'
 property :sensitive, [true, false], default: true
 
 action :create do
+  compose_name = new_resource.host_domain.gsub('.', '_')
+
   # Pull down the latest version
   docker_image 'halfshot/matrix-hookshot' do
     tag new_resource.tag
@@ -139,6 +141,7 @@ action :create do
     command "openssl genpkey -out \"#{new_resource.host_path}/keys/hookshot.pem\" -outform PEM -algorithm RSA -pkeyopt rsa_keygen_bits:4096; chmod 400 '#{new_resource.host_path}/keys/hookshot.pem'"
     user 'synapse'
     group 'synapse'
+    sensitive true
     creates "#{new_resource.host_path}/keys/hookshot.pem"
   end
 
@@ -169,6 +172,14 @@ action :create do
         ],
         'user' => osl_synapse_user,
         'restart' => 'always',
+        'networks' => [
+          compose_name,
+        ],
+      },
+    },
+    'networks' => {
+      compose_name => {
+        'external' => true,
       },
     },
   }
