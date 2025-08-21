@@ -2,6 +2,10 @@
 
 This file is used to list changes made in each version of the osl-matrix cookbook.
 
+1.7.0 (2025-08-21)
+------------------
+- Changed to using normal version of Mjolnir
+
 1.6.3 (2025-08-07)
 ------------------
 - Add docker compose helper script
