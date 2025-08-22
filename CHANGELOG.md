@@ -2,6 +2,10 @@
 
 This file is used to list changes made in each version of the osl-matrix cookbook.
 
+1.7.1 (2025-08-22)
+------------------
+- Almalinux 10 Integration
+
 1.7.0 (2025-08-21)
 ------------------
 - Changed to using normal version of Mjolnir
