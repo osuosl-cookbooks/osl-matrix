@@ -169,10 +169,10 @@ describe docker_container('synapse_service_chat_example_org-mjolnir-1') do
 end
 
 # Database Docker Container
-describe docker_container('e5af17-mjolnir-db-1') do
+describe docker_container('synapse_service_chat_example_org-matrix-appservice-irc-postgres-1') do
   it { should exist }
   it { should be_running }
-  its('image') { should eq 'postgres' }
+  its('image') { should eq 'postgres:16' }
 end
 
 describe command '/opt/synapse-chat.example.org/bin/docker_compose ps' do

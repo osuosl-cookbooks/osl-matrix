@@ -37,7 +37,7 @@ describe file('/opt/synapse-chat.example.org/homeserver.yaml') do
 end
 
 # Docker Container
-describe docker_container('synapse-synapse-1') do
+describe docker_container('chat_example_org-synapse-1') do
   it { should exist }
   it { should be_running }
   its('image') { should eq 'matrixdotorg/synapse:latest' }
