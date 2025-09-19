@@ -6,12 +6,11 @@ end
 
 include_recipe 'osl-docker'
 
-osl_postgresql_server 'default' do
-  access 'access'
-  databases 'databases'
-  users 'users'
-  osl_only false
-  action [:create, :start]
+osl_postgresql_test 'synapse' do
+  username 'synapse'
+  password 'password'
+  lc_collate 'C'
+  lc_ctype 'C'
 end
 
 # Create the synapse docker container
