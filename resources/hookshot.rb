@@ -44,17 +44,17 @@ action :create do
     end
     # Add the userIDPrefix
     arrAppServiceUsers.push({
-      'exclusive' => true,
-      'regex' => "@#{val['userIdPrefix']}.*",
-    })
+                              'exclusive' => true,
+                              'regex' => "@#{val['userIdPrefix']}.*",
+                            })
   end
 
   # Add in something if there was nothing given
   unless arrAppServiceUsers
     arrAppServiceUsers.push({
-      'exclusive' => true,
-      'regex' => '\'@webhook_.*\'',
-    })
+                              'exclusive' => true,
+                              'regex' => '\'@webhook_.*\'',
+                            })
   end
 
   # Generate the app service file
@@ -73,18 +73,18 @@ action :create do
   # Passkey settings
   # Not usually needed to be modified by user, as we generate our own, but just in case.
   config.merge!({
-    'passFile' => '/data/keys/hookshot.pem',
-  }) { |_key, old_value, new_value| old_value || new_value }
+                  'passFile' => '/data/keys/hookshot.pem',
+                }) { |_key, old_value, new_value| old_value || new_value }
 
   # Bridge settings
   # Ensure the bridge key hash exists
   config['bridge'] = {} unless config['bridge']
   config['bridge'].merge!({
-    'domain' => new_resource.host_domain,
-    'url' => "http://synapse:#{find_resource(:osl_synapse, new_resource.host_domain).port}", # Find the synapse resource, and get the port
-    'port' => new_resource.port,
-    'bindAddress' => '0.0.0.0',
-  }) { |_key, old_value, new_value| old_value || new_value }
+                            'domain' => new_resource.host_domain,
+                            'url' => "http://synapse:#{find_resource(:osl_synapse, new_resource.host_domain).port}", # Find the synapse resource, and get the port
+                            'port' => new_resource.port,
+                            'bindAddress' => '0.0.0.0',
+                          }) { |_key, old_value, new_value| old_value || new_value }
 
   # Listeners settings
   # Force the automatically generated configuration, custom config goes against the spirit of some properties.

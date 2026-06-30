@@ -40,12 +40,12 @@ osl_synapse_service 'chat.example.org' do
     }
   )
   config_matrix_irc({
-    'ircService' => {
-      'servers' => {
-        'ircd' => {},
-      },
-    },
-  })
+                      'ircService' => {
+                        'servers' => {
+                          'ircd' => {},
+                        },
+                      },
+                    })
 end
 
 osl_matrix_user 'test' do

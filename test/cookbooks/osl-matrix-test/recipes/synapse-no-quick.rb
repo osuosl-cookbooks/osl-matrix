@@ -78,12 +78,12 @@ end
 osl_matrix_irc 'osl-matrix-irc' do
   host_domain 'chat.example.org'
   config({
-    'ircService' => {
-      'servers' => {
-        'ircd' => {},
-      },
-    },
-  })
+           'ircService' => {
+             'servers' => {
+               'ircd' => {},
+             },
+           },
+         })
   notifies :rebuild, 'osl_dockercompose[synapse]'
   notifies :restart, 'osl_dockercompose[synapse]'
   notifies :create, 'osl_synapse[chat.example.org]'
@@ -103,23 +103,23 @@ end
 osl_hookshot 'osl-hookshot-webhook' do
   host_domain 'chat.example.org'
   config({
-    'permissions' => [
-      {
-        'actor' => 'chat.example.org',
-        'services' => [
-          {
-            'service' => '*',
-            'level' => 'admin',
-          },
-        ],
-      },
-    ],
-    'generic' => {
-      'enabled' => true,
-      'urlPrefix' => 'http://chat.example.org/webhook',
-      'userIdPrefix' => 'my-amazing-hook_',
-    },
-  })
+           'permissions' => [
+             {
+               'actor' => 'chat.example.org',
+               'services' => [
+                 {
+                   'service' => '*',
+                   'level' => 'admin',
+                 },
+               ],
+             },
+           ],
+           'generic' => {
+             'enabled' => true,
+             'urlPrefix' => 'http://chat.example.org/webhook',
+             'userIdPrefix' => 'my-amazing-hook_',
+           },
+         })
   notifies :rebuild, 'osl_dockercompose[synapse]'
   notifies :restart, 'osl_dockercompose[synapse]'
   notifies :create, 'osl_synapse[chat.example.org]'
@@ -129,20 +129,20 @@ end
 # Additional servers for testing
 file '/opt/synapse-chat.example.org/compose/docker-addons.yaml' do
   content osl_yaml_dump({
-    'services' => {
-      'postgres' => {
-        'image' => 'postgres',
-        'environment' => {
-          'POSTGRES_PASSWORD' => 'password',
-          'POSTGRES_USER' => 'synapse',
-          'POSTGRES_INITDB_ARGS' => '--encoding=UTF8 --locale=C',
-        },
-      },
-      'ircd' => {
-        'image' => 'inspircd/inspircd-docker',
-      },
-    },
-  })
+                          'services' => {
+                            'postgres' => {
+                              'image' => 'postgres',
+                              'environment' => {
+                                'POSTGRES_PASSWORD' => 'password',
+                                'POSTGRES_USER' => 'synapse',
+                                'POSTGRES_INITDB_ARGS' => '--encoding=UTF8 --locale=C',
+                              },
+                            },
+                            'ircd' => {
+                              'image' => 'inspircd/inspircd-docker',
+                            },
+                          },
+                        })
   owner 'synapse'
   group 'synapse'
   mode '400'
