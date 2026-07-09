@@ -2,7 +2,7 @@
 # Cookbook:: osl-matrix
 # Spec:: osl_synapse, osl_heisenbridge, osl_hookshot
 #
-# Copyright:: 2023-2025, Oregon State University
+# Copyright:: 2023-2026, Oregon State University
 #
 
 require_relative '../../spec_helper'
@@ -12,17 +12,17 @@ describe 'osl-matrix-test::synapse-no-quick' do
     context "#{p[:platform]} #{p[:version]}" do
       cached(:chef_run) do
         ChefSpec::SoloRunner.new(p.merge({
-          step_into: %w(
-            osl_heisenbridge
-            osl_hookshot
-            osl_matrix_admin_user
-            osl_matrix_channel
-            osl_matrix_irc
-            osl_matrix_user
-            osl_mjolnir
-            osl_synapse
-          ),
-        })).converge(described_recipe)
+                                           step_into: %w(
+                                             osl_heisenbridge
+                                             osl_hookshot
+                                             osl_matrix_admin_user
+                                             osl_matrix_channel
+                                             osl_matrix_irc
+                                             osl_matrix_user
+                                             osl_mjolnir
+                                             osl_synapse
+                                           ),
+                                         })).converge(described_recipe)
       end
 
       include_context 'pwnam'

@@ -219,7 +219,7 @@ module OSLMatrix
 
       # Get the UID and GID of the synapse user
       def osl_synapse_user
-        "#{Etc.getpwnam('synapse').uid.to_s}:#{Etc.getpwnam('synapse').gid.to_s}"
+        "#{Etc.getpwnam('synapse').uid}:#{Etc.getpwnam('synapse').gid}"
       end
 
       # Checks if the Synapse server is responsive ONCE.
