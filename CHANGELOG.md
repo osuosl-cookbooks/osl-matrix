@@ -2,6 +2,10 @@
 
 This file is used to list changes made in each version of the osl-matrix cookbook.
 
+1.7.2 (2026-07-09)
+------------------
+- cinc: updated kitchen file
+
 1.7.1 (2025-08-22)
 ------------------
 - Almalinux 10 Integration
