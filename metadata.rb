@@ -8,9 +8,9 @@ source_url        'https://github.com/osuosl-cookbooks/osl-matrix'
 chef_version      '>= 17.0'
 version           '1.7.2'
 
-supports          'almalinux', '~> 8.0'
-supports          'almalinux', '~> 9.0'
-supports          'almalinux', '~> 10.0'
+supports 'almalinux', '~> 8.0'
+supports 'almalinux', '~> 9.0'
+supports 'almalinux', '~> 10.0'
 
 depends           'osl-docker', '>= 4.16.1'
 depends           'osl-firewall'
