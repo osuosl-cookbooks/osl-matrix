@@ -137,6 +137,11 @@ describe 'osl-matrix-test::synapse-no-quick' do
             notify('osl_dockercompose[chat_example_org]').to(:rebuild)
       end
 
+      it do
+        expect(chef_run.file('/opt/synapse-chat.example.org/homeserver.yaml')).to \
+            notify('osl_dockercompose[chat_example_org]').to(:restart).immediately
+      end
+
       # Create the Synapse compose file
       it do
         is_expected.to create_file('/opt/synapse-chat.example.org/compose/docker-synapse.yaml').with(

@@ -77,6 +77,7 @@ action :create do
     mode '400'
     sensitive true
     notifies :rebuild, "osl_dockercompose[#{compose_name}]"
+    notifies :restart, "osl_dockercompose[#{compose_name}]", :immediately
   end
 
   config_compose = {
