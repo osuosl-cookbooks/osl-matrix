@@ -477,6 +477,7 @@ module OSLMatrix
         ::Dir.entries("#{new_resource.path}/appservice")
              .select { |f| f.end_with?('.yaml') }
              .map { |f| File.basename(f, '.yaml') }
+             .sort
       end
     end
   end

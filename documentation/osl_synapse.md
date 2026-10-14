@@ -8,6 +8,8 @@ Set up a Matrix Synapse server, and configure the server.
 
 Any missing properties with the `pg_` prefix will result in the server setting up an SQLite database. This database type is not recommended for deployments.
 
+Synapse only reads `homeserver.yaml` at startup, so any change to it restarts the Synapse container during the converge.
+
 ## Actions
 
 | Action   | Description                       |
