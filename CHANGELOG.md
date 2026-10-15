@@ -2,6 +2,10 @@
 
 This file is used to list changes made in each version of the osl-matrix cookbook.
 
+1.7.3 (2026-10-15)
+------------------
+- Restart Synapse when homeserver.yaml changes
+
 1.7.2 (2026-07-09)
 ------------------
 - cinc: updated kitchen file
