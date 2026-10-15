@@ -137,6 +137,11 @@ describe 'osl-matrix-test::synapse-no-quick' do
             notify('osl_dockercompose[chat_example_org]').to(:rebuild)
       end
 
+      it do
+        expect(chef_run.file('/opt/synapse-chat.example.org/homeserver.yaml')).to \
+            notify('osl_dockercompose[chat_example_org]').to(:restart).immediately
+      end
+
       # Create the Synapse compose file
       it do
         is_expected.to create_file('/opt/synapse-chat.example.org/compose/docker-synapse.yaml').with(
@@ -555,6 +560,30 @@ describe 'osl-matrix-test::synapse-no-quick' do
           EOF
         )
       end
+    end
+  end
+
+  context 'with appservice files on disk' do
+    cached(:chef_run) do
+      ChefSpec::SoloRunner.new(ALMA_9.merge(step_into: %w(osl_synapse))).converge(described_recipe)
+    end
+
+    include_context 'pwnam'
+    include_context 'common'
+
+    before do
+      allow(Dir).to receive(:exist?).and_call_original
+      allow(Dir).to receive(:exist?).with('/opt/synapse-chat.example.org/appservice').and_return(true)
+      allow(Dir).to receive(:entries).and_call_original
+      allow(Dir).to receive(:entries).with('/opt/synapse-chat.example.org/appservice').and_return(
+        %w(. .. osl-moderate.yaml osl-hookshot-webhook.yaml)
+      )
+    end
+
+    it do
+      is_expected.to create_file('/opt/synapse-chat.example.org/homeserver.yaml').with(
+        content: %r{app_service_config_files:\n- "/data/appservice/osl-hookshot-webhook.yaml"\n- "/data/appservice/osl-moderate.yaml"\n}
+      )
     end
   end
 end
