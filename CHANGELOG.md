@@ -2,6 +2,10 @@
 
 This file is used to list changes made in each version of the osl-matrix cookbook.
 
+1.8.0 (2026-10-19)
+------------------
+- Add an environment property for the Synapse container
+
 1.7.3 (2026-10-15)
 ------------------
 - Restart Synapse when homeserver.yaml changes
