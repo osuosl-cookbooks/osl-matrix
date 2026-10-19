@@ -162,6 +162,8 @@ describe 'osl-matrix-test::synapse-no-quick' do
                 restart: always
                 networks:
                 - chat_example_org
+                environment:
+                  PYTHONMALLOC: malloc
             networks:
               chat_example_org:
                 external: true

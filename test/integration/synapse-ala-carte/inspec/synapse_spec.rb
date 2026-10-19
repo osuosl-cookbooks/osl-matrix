@@ -45,6 +45,10 @@ describe docker_container('chat_example_org-synapse-1') do
   its('ports') { should match '8448/tcp' }
 end
 
+describe command("docker inspect -f '{{.Config.Env}}' chat_example_org-synapse-1") do
+  its('stdout') { should match /PYTHONMALLOC=malloc/ }
+end
+
 # Check to see if we can send HTTP requests
 describe http('localhost:8008/_matrix/client/versions', headers: { 'host': 'chat.example.org' }) do
   its('status') { should eq 200 }

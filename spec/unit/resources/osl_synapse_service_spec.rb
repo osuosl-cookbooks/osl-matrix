@@ -65,6 +65,7 @@ describe 'osl-matrix-test::synapse' do
           port: 8008,
           fed_port: 8448,
           reg_key: 'this-is-my-secret',
+          environment: {},
           tag: 'latest'
         )
       end
@@ -231,6 +232,23 @@ describe 'osl-matrix-test::synapse' do
             ),
           }
         )
+      end
+
+      context 'stepping into osl_synapse' do
+        cached(:chef_run) do
+          ChefSpec::SoloRunner.new(p.merge({
+                                             step_into: %w(
+                                               osl_synapse_service
+                                               osl_synapse
+                                             ),
+                                           })).converge(described_recipe)
+        end
+
+        # An unset environment must keep existing compose files, and so containers, unchanged
+        it do
+          expect(chef_run.file('/opt/synapse-chat.example.org/compose/docker-synapse.yaml').content).to_not \
+            include('environment:')
+        end
       end
     end
   end
