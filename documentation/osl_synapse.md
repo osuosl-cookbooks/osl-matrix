@@ -24,6 +24,7 @@ Synapse only reads `homeserver.yaml` at startup, so any change to it restarts th
 | `config`         | Hash             | `{}`                                             | General Matrix Synapse settings to apply. Information of arguments can be found in the [Synapse Documentation](https://matrix-org.github.io/synapse/latest/usage/configuration/config_documentation.html) | |
 | `container_name` | String           | `synapse-{domain}`                        | The name of the Docker container containing the Matrix Synapse server | |
 | `domain`         | String           |                                                  | The FQDN of the matrix synapse site | Yes, resource name |
+| `environment`    | Hash             | `{}`                                             | Environment variables for the Synapse container. Left out of the compose file when empty. Changing it recreates the container, which pulls `tag` again. | |
 | `path`           | String           | `/opt/{container_name}`                  | The path to the configuration files of the Matrix Synapse server | |
 | `pg_host`        | String           |                                                  | IP/Hostname of the Postgresql server | |
 | `pg_name`        | String           |                                                  | Database name | |
@@ -52,6 +53,21 @@ osl_synapse 'chat.example.org' do
       '127.0.0.0/8',
       '10.0.0.0/8'
     ]
+  })
+end
+
+# Cap cache memory. cache_autotuning reads jemalloc's stats, which miss
+# Python's small-object allocator unless PYTHONMALLOC=malloc is set.
+osl_synapse 'chat.example.org' do
+  environment('PYTHONMALLOC' => 'malloc')
+  config({
+    'caches' => {
+      'cache_autotuning' => {
+        'max_cache_memory_usage' => '1024M',
+        'target_cache_memory_usage' => '768M',
+        'min_cache_ttl' => '5m',
+      },
+    },
   })
 end
 ```

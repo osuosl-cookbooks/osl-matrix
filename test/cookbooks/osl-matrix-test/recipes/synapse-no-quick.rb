@@ -21,6 +21,7 @@ osl_synapse 'chat.example.org' do
   pg_name 'synapse'
   pg_username 'synapse'
   pg_password 'password'
+  environment('PYTHONMALLOC' => 'malloc')
   config(
     {
       'modules' => [

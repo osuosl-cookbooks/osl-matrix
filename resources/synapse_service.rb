@@ -11,6 +11,7 @@ property :config_hookshot, Hash, default: {}
 property :config_matrix_irc, Hash, default: {}
 property :config_mjolnir, Hash, default: {}
 property :domain, String, name_property: true
+property :environment, Hash, default: {}
 property :fed_port, Integer, default: 8448
 property :irc_users_regex, String, default: '@as-irc_.*'
 property :key_github, String, sensitive: true
@@ -45,6 +46,7 @@ action :create do
   osl_synapse new_resource.domain do
     appservices new_resource.appservices
     config new_resource.config
+    environment new_resource.environment
     pg_host new_resource.pg_host
     pg_name new_resource.pg_name
     pg_username new_resource.pg_username

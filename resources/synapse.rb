@@ -8,6 +8,7 @@ property :appservices, Array, default: []
 property :config, Hash
 property :container_name, String, default: lazy { "synapse-#{domain}" }
 property :domain, String, name_property: true
+property :environment, Hash, default: {}
 property :path, String, default: lazy { "/opt/#{container_name}" }
 property :pg_host, String
 property :pg_name, String
@@ -101,6 +102,8 @@ action :create do
       },
     },
   }
+  # Only when set, so existing compose files (and containers) stay unchanged
+  config_compose['services']['synapse']['environment'] = new_resource.environment unless new_resource.environment.empty?
 
   # Generate compose file
   file "#{new_resource.path}/compose/docker-synapse.yaml" do

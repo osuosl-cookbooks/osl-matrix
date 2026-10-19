@@ -30,6 +30,7 @@ Any missing properties with the `pg_` prefix will result in the server setting u
 | `config_hookshot`| Hash             |                                                  | General Matrix Hookshot settings to apply, mostly going to be used to set up specific services and configuration permissions. A lot of other required configurations have been automated. Information of arguments can be found in the [Hookshot Documentation](https://matrix-org.github.io/matrix-hookshot/latest/setup/sample-configuration.html) | |
 | `config_mjolnir` | Hash             |                                                  | A grainular application to Mjolnir settings. A lot of other required configurations have been automated. Information of arguments can be found in the [Mjolnir Example](https://github.com/matrix-org/mjolnir/blob/main/src/appservice/config/config.example.yaml) | |
 | `domain`         | String           |                                                  | The FQDN of the matrix synapse site | Yes, resource name |
+| `environment`    | Hash             | `{}`                                             | Environment variables for the Synapse container, passed to [`osl_synapse`](osl_synapse.md). | |
 | `pg_host`        | String           |                                                  | IP/Hostname of the Postgresql server | |
 | `pg_name`        | String           |                                                  | Database name | |
 | `pg_username`    | String           |                                                  | Username for connecting to the PostgreSQL server | |
@@ -60,6 +61,21 @@ osl_synapse_service 'chat.example.org' do
       '127.0.0.0/8',
       '10.0.0.0/8'
     ]
+  })
+end
+
+# Cap cache memory. cache_autotuning reads jemalloc's stats, which miss
+# Python's small-object allocator unless PYTHONMALLOC=malloc is set.
+osl_synapse_service 'chat.example.org' do
+  environment('PYTHONMALLOC' => 'malloc')
+  config({
+    'caches' => {
+      'cache_autotuning' => {
+        'max_cache_memory_usage' => '1024M',
+        'target_cache_memory_usage' => '768M',
+        'min_cache_ttl' => '5m',
+      },
+    },
   })
 end
 ```
