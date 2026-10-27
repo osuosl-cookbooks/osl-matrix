@@ -2,6 +2,10 @@
 
 This file is used to list changes made in each version of the osl-matrix cookbook.
 
+1.8.1 (2026-10-27)
+------------------
+- Omit a nil topic when creating a channel
+
 1.8.0 (2026-10-19)
 ------------------
 - Add an environment property for the Synapse container
