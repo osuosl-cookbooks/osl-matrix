@@ -444,7 +444,7 @@ module OSLMatrix
         }
 
         Chef::Log.info("Attempting to create channel ##{channel_alias}...")
-        response = perform_request(create_uri, method: :post, headers: headers, body: payload)
+        response = perform_request(create_uri, method: :post, headers: headers, body: payload.compact)
 
         unless response.is_a?(Net::HTTPSuccess)
           raise "Failed to create channel. Response: #{response.code} #{response.body}"
