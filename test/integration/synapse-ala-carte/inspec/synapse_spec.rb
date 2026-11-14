@@ -99,7 +99,19 @@ describe docker_container('synapse-osl-hookshot-webhook-1') do
   it { should exist }
   it { should be_running }
   its('image') { should eq 'halfshot/matrix-hookshot:latest' }
-  its('ports') { should match '9000-9002->9000-9002/tcp' }
+end
+
+# Webhooks stay public for haproxy; metrics and widgets are local only
+describe port(9000) do
+  it { should be_listening }
+  its('addresses') { should include '0.0.0.0' }
+end
+
+[9001, 9002].each do |p|
+  describe port(p) do
+    it { should be_listening }
+    its('addresses') { should eq ['127.0.0.1'] }
+  end
 end
 
 # Matrix-Appservice-IRC Appservice
