@@ -336,8 +336,8 @@ describe 'osl-matrix-test::synapse-no-quick' do
                 image: halfshot/matrix-hookshot:latest
                 ports:
                 - 9000:9000
-                - 9001:9001
-                - 9002:9002
+                - 127.0.0.1:9001:9001
+                - 127.0.0.1:9002:9002
                 volumes:
                 - "/opt/synapse-chat.example.org/appservice/osl-hookshot-webhook.yaml:/data/registration.yml"
                 - "/opt/synapse-chat.example.org/osl-hookshot-webhook-config.yaml:/data/config.yml"
@@ -552,7 +552,7 @@ describe 'osl-matrix-test::synapse-no-quick' do
                 - "/opt/synapse-chat.example.org/osl-moderate-config.yaml:/data/config.yaml:ro"
                 - "/opt/synapse-chat.example.org/appservice-data/osl-moderate:/data"
                 ports:
-                - 9003:9003
+                - 127.0.0.1:9003:9003
                 restart: always
                 networks:
                 - chat_example_org
