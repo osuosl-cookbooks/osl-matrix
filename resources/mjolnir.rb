@@ -57,7 +57,7 @@ action :create do
           "#{new_resource.host_path}/appservice-data/#{new_resource.container_name}:/data",
         ],
         'ports' => [
-          "#{new_resource.port_api}:#{new_resource.port_api}",
+          "127.0.0.1:#{new_resource.port_api}:#{new_resource.port_api}",
         ],
         'restart' => 'always',
         'networks' => [

@@ -97,8 +97,20 @@ describe docker_container('synapse_service_chat_example_org-hookshot-1') do
   it { should exist }
   it { should be_running }
   its('image') { should eq 'halfshot/matrix-hookshot:latest' }
-  its('ports') { should match '9000-9002->9000-9002/tcp' }
   its('status') { should match /Up.*/ }
+end
+
+# Webhooks stay public for haproxy; metrics and widgets are local only
+describe port(9000) do
+  it { should be_listening }
+  its('addresses') { should include '0.0.0.0' }
+end
+
+[9001, 9002].each do |p|
+  describe port(p) do
+    it { should be_listening }
+    its('addresses') { should eq ['127.0.0.1'] }
+  end
 end
 
 # Matrix-Appservice-IRC Appservice
@@ -166,6 +178,11 @@ describe docker_container('synapse_service_chat_example_org-mjolnir-1') do
   it { should exist }
   its('image') { should eq 'matrixdotorg/mjolnir:latest' }
   its('status') { should match /Up.*/ }
+end
+
+describe port(9003) do
+  it { should be_listening }
+  its('addresses') { should eq ['127.0.0.1'] }
 end
 
 # Database Docker Container

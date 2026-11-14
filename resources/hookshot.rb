@@ -161,8 +161,8 @@ action :create do
         'image' => "halfshot/matrix-hookshot:#{new_resource.tag}",
         'ports' => [
           "#{new_resource.port_webhook}:#{new_resource.port_webhook}",
-          "#{new_resource.port_metric}:#{new_resource.port_metric}",
-          "#{new_resource.port_widget}:#{new_resource.port_widget}",
+          "127.0.0.1:#{new_resource.port_metric}:#{new_resource.port_metric}",
+          "127.0.0.1:#{new_resource.port_widget}:#{new_resource.port_widget}",
         ],
         'volumes' => [
           "#{new_resource.host_path}/appservice/#{new_resource.container_name}.yaml:/data/registration.yml",
