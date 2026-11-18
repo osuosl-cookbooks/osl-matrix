@@ -1,6 +1,6 @@
 #
 # Cookbook:: osl-matrix
-# Spec:: osl_element
+# Spec:: osl_synapse_admin
 #
 # Copyright:: 2023-2026, Oregon State University
 #
@@ -18,62 +18,49 @@ describe 'osl-matrix-test::synapse-admin' do
 
       it { is_expected.to include_recipe 'osl-docker' }
 
-      # Single server
-      it { is_expected.to create_directory('/opt/synapse_admin_test_admin') }
+      {
+        'test_admin' => {
+          tag: 'v1',
+          port: '8080',
+          content: '{"restrictBaseUrl":"https://chat.example.org"}',
+        },
+        'test_multiple_servers' => {
+          tag: 'v1',
+          port: '8081',
+          content: '{"restrictBaseUrl":["https://chat.example.org","https://ops.example.org","https://osuosl.example.org"]}',
+        },
+        'test_pinned' => {
+          tag: 'v1.5.2',
+          port: '8082',
+          content: '{"asManagedUsers":["^@bot:example.org$"],"restrictBaseUrl":"https://chat.example.org"}',
+        },
+      }.each do |name, want|
+        it { is_expected.to create_directory("/opt/synapse_admin_#{name}") }
 
-      it do
-        is_expected.to create_file('/opt/synapse_admin_test_admin/config.json').with(
-          content: '{"restrictBaseUrl":"https://chat.example.org"}'
-        )
-      end
+        it do
+          is_expected.to create_file("/opt/synapse_admin_#{name}/config.json").with(content: want[:content])
+        end
 
-      it do
-        expect(chef_run.file('/opt/synapse_admin_test_admin/config.json')).to \
-          notify('docker_container[test_admin]').to(:redeploy)
-      end
+        it do
+          expect(chef_run.file("/opt/synapse_admin_#{name}/config.json")).to \
+            notify("docker_container[#{name}]").to(:redeploy)
+        end
 
-      it { is_expected.to pull_docker_image('awesometechnologies/synapse-admin') }
+        it { is_expected.to pull_docker_image("ketesa_#{name}").with(repo: 'etkecc/ketesa', tag: want[:tag]) }
 
-      it do
-        expect(chef_run.docker_image('awesometechnologies/synapse-admin')).to \
-          notify('docker_container[test_admin]').to(:redeploy)
-      end
+        it do
+          expect(chef_run.docker_image("ketesa_#{name}")).to \
+            notify("docker_container[#{name}]").to(:redeploy)
+        end
 
-      it do
-        is_expected.to run_docker_container('test_admin').with(
-          repo: 'awesometechnologies/synapse-admin',
-          port: ['8080:80'],
-          volumes: {}
-        )
-      end
-
-      # Multiple servers
-      it { is_expected.to create_directory('/opt/synapse_admin_test_multiple_servers') }
-
-      it do
-        is_expected.to create_file('/opt/synapse_admin_test_multiple_servers/config.json').with(
-          content: '{"restrictBaseUrl":["https://chat.example.org","https://ops.example.org","https://osuosl.example.org"]}'
-        )
-      end
-
-      it do
-        expect(chef_run.file('/opt/synapse_admin_test_multiple_servers/config.json')).to \
-          notify('docker_container[test_multiple_servers]').to(:redeploy)
-      end
-
-      it { is_expected.to pull_docker_image('awesometechnologies/synapse-admin') }
-
-      it do
-        expect(chef_run.docker_image('awesometechnologies/synapse-admin')).to \
-          notify('docker_container[test_multiple_servers]').to(:redeploy)
-      end
-
-      it do
-        is_expected.to run_docker_container('test_multiple_servers').with(
-          repo: 'awesometechnologies/synapse-admin',
-          port: ['8081:80'],
-          volumes: {}
-        )
+        it do
+          is_expected.to run_docker_container(name).with(
+            repo: 'etkecc/ketesa',
+            tag: want[:tag],
+            port: ["#{want[:port]}:8080"],
+            volumes_binds: ["/opt/synapse_admin_#{name}/config.json:/var/public/config.json:ro"]
+          )
+        end
       end
     end
   end
