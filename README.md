@@ -6,13 +6,21 @@ TODO: Enter the cookbook description here.
 
 ### Platforms
 
-- CentOS 7+
+- AlmaLinux 8, 9 and 10
 
 ### Cookbooks
 
 ## Attributes
 
 ## Resources
+
+- [osl_element](documentation/osl_element.md)
+- [osl_heisenbridge](documentation/osl_heisenbridge.md)
+- [osl_hookshot](documentation/osl_hookshot.md)
+- [osl_mjolnir](documentation/osl_mjolnir.md)
+- [osl_synapse](documentation/osl_synapse.md)
+- [osl_synapse_admin](documentation/osl_synapse_admin.md)
+- [osl_synapse_service](documentation/osl_synapse_service.md)
 
 ## Recipes
 
